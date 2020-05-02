@@ -10,6 +10,13 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>dao</artifactId>
     <packaging>jar</packaging>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <mysql-connector-java.version>8.0.19</mysql-connector-java.version>
+        <hibernate-core.version>5.4.5.Final</hibernate-core.version>
+    </properties>
     <build>
         <plugins>
             <plugin>
@@ -24,12 +31,7 @@
     </build>
     <dependencies>
         <!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.19</version>
-        </dependency>
-        <dependency>
+         <dependency>
             <groupId>com.mchange</groupId>
             <artifactId>c3p0</artifactId>
             <version>0.9.5.4</version>
@@ -38,6 +40,21 @@
             <groupId>org.example</groupId>
             <artifactId>model</artifactId>
             <version>1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql-connector-java.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>${hibernate-core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-ehcache</artifactId>
+            <version>${hibernate-core.version}</version>
         </dependency>
         <dependency>
             <groupId>org.junit.platform</groupId>
@@ -74,6 +91,12 @@
             <artifactId>mockito-junit-jupiter</artifactId>
             <version>3.3.3</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.xmlbeans</groupId>
+            <artifactId>xmlbeans</artifactId>
+            <version>2.6.0</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

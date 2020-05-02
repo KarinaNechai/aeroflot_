@@ -13,20 +13,20 @@ import java.io.IOException;
 public class EncodingFilter implements Filter {
     private static final Logger logger = LogManager.getLogger();
     @Override
-    public void init(FilterConfig config) throws ServletException {
+    public void init(FilterConfig config) {
         logger.info("Filter init() start");
         ServletContext context = config.getServletContext();
         FilterRegistration registration2 = context.getFilterRegistration("Filter2");
-         registration2.addMappingForUrlPatterns(null, true, new String[]{"/airport", "/flights", "/planes", "/workers", "/Admin","/crew","/add*"});
-        registration2.addMappingForServletNames(null, true, new String[]{"/airport", "/flights", "/planes", "/workers", "/Admin","/crew"});
+         registration2.addMappingForUrlPatterns(null, true, "/airport", "/flights", "/planes", "/workers", "/Admin","/crew","/add*");
+        registration2.addMappingForServletNames(null, true, "/airport", "/flights", "/planes", "/workers", "/Admin","/crew");
 
         FilterRegistration registration3 = context.getFilterRegistration("Filter3");
         registration3.addMappingForServletNames(null, true, "/Admin");
         registration3.addMappingForUrlPatterns(null, true, "/admin");
 
         FilterRegistration registration4 = context.getFilterRegistration("Filter4");
-        registration4.addMappingForServletNames(null, true, new String[]{"/airport","/flights","/planes","/workers","/crew"});
-        registration3.addMappingForUrlPatterns(null, true, new String[]{"/airport","/flights","/planes","/workers","/crew","/add*"});
+        registration4.addMappingForServletNames(null, true, "/airport","/flights","/planes","/workers","/crew");
+        registration4.addMappingForUrlPatterns(null, true, "/airport","/flights","/planes","/workers","/crew","/add*");
     }
 
     @Override

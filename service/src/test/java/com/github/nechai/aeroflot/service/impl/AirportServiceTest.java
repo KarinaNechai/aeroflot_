@@ -23,10 +23,10 @@ public class AirportServiceTest {
     private AirportDao airportDao;
     @Test
     public void addAirport() {
-        Mockito.when(airportDao.insert(any())).thenReturn(true);
-        Mockito.when(airportDao.insert(null)).thenReturn(false);
-        assertTrue(airportService.addAirport(new Airport("Dallase")));
-        assertFalse(airportService.addAirport(null));
+        Mockito.when(airportDao.insert(any())).thenReturn(1);
+        Mockito.when(airportDao.insert(null)).thenReturn(-1);
+        assertEquals(1,airportService.addAirport(new Airport("Dallase")));
+        assertEquals(-1,airportService.addAirport(null));
     }
 
     @Test

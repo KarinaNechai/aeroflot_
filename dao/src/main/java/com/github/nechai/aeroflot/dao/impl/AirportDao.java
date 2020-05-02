@@ -1,13 +1,13 @@
 package com.github.nechai.aeroflot.dao.impl;
-
-import com.github.nechai.aeroflot.dao.DataSource;
+import com.github.nechai.aeroflot.dao.HibernateUtil;
 import com.github.nechai.aeroflot.dao.IAirportDao;
+import com.github.nechai.aeroflot.dao.converter.AirportConverter;
+import com.github.nechai.aeroflot.dao.entity.AirportEntity;
 import com.github.nechai.aeroflot.model.Airport;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import org.hibernate.CacheMode;
+import org.hibernate.FlushMode;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,41 +30,41 @@ public class AirportDao implements IAirportDao {
         return localInstance;
     }
 
+
     @Override
-    public boolean insert(Airport airport) {
-        if (airport==null) return false;
-        String str= "INSERT INTO myapp.airport (airportname,actfl) VALUES (?,?)";
-        int actFl=airport.isActual()?1:0;
-        try {
-            Connection connection = DataSource.getInstance().getConnection();
-            PreparedStatement ps = connection.prepareStatement(str);
-            ps.setString(1, airport.getName());
-            ps.setInt(2, actFl);
-            if(ps.executeUpdate() == 1){
-                boolean res=true;
-                return true;
-            }
-            else{
-                return false;
-            }
-        }catch (SQLException e)
-        {throw new RuntimeException(e);
-        }
+    public int insert(Airport airport) {
+        AirportEntity airportEntity = AirportConverter.toEntity(airport);
+        final Session session = HibernateUtil.getSession();
+        session.beginTransaction();
+        session.save(airportEntity);
+        session.getTransaction().commit();
+        return airportEntity.getId();
     }
-    private int getId (Airport airport){
-    try {
-            String str="select t.airportid from myapp.airport t where t.airportname=?";
+
+ /*   private int getId(Airport airport) {
+        try {
+            String str = "select t.airportid from myapp.airport t where t.airportname=?";
             Connection connection = DataSource.getInstance().getConnection();
             PreparedStatement ps = connection.prepareStatement(str);
             ps.setString(1, airport.getName() != null ? airport.getName() : "");
             ResultSet rs = ps.executeQuery();
-            return (rs.next()?rs.getInt("airportid"):-1) ;
-        }catch (SQLException e){
+            return (rs.next() ? rs.getInt("airportid") : -1);
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
+*/
 
     @Override
+    public boolean update(Airport airport){
+     AirportEntity airportEntity = AirportConverter.toEntity(airport);
+     final Session session = HibernateUtil.getSession();
+     session.beginTransaction();
+     session.saveOrUpdate(airportEntity);
+     session.getTransaction().commit();
+     return true;
+}
+  /*  @Override
     public boolean update(Airport airport) {
         if (airport==null) return false;
         int airportId=airport.getId();
@@ -87,50 +87,50 @@ public class AirportDao implements IAirportDao {
             throw new RuntimeException(e);
         }
     }
-
+*/
     @Override
     public boolean delete(Airport airport) {
-        int airportId=getId(airport);
-        if (airportId==-1 ) return true;
         airport.setActual(false);
         return update(airport);
     }
 
     @Override
     public boolean delete(int airportId) {
-        String str= "update myapp.airport set actfl=0 where airportid=?";
-        try {
-            Connection connection = DataSource.getInstance().getConnection();
-            PreparedStatement ps = connection.prepareStatement(str);
-             ps.setInt(1, airportId);
-            return (1 != ps.executeUpdate())?false:true;
-        }catch (SQLException e){
-            throw new RuntimeException(e);
-        }
+        return delete(getAirportById(airportId));
     }
 
     @Override
     public List<Airport> getListAirport() {
-         List <Airport> airports=new ArrayList<>();
-        try {
-            Connection connection = DataSource.getInstance().getConnection();
-            PreparedStatement ps = connection.prepareStatement("select t.* from myapp.airport t  where t.actfl=?");
-            ps.setInt(1, 1);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                final Airport airport = new Airport(
-                        rs.getInt("airportid"),
-                        rs.getString("airportname"),
-                        rs.getInt("actfl")==1?true:false);
-                airports.add(airport);
-            }
-
-        }catch (SQLException e){
-            throw new RuntimeException(e);
+        List <Airport> airports=new ArrayList<>();
+        final Session session = HibernateUtil.getSession();
+        Query query = session.createQuery("from AirportEntity where actFl=:paramActFl");
+        query.setParameter("paramActFl", 1);
+        query.setTimeout(1000).setCacheable(true)
+    // добавлять в кэш, но не считывать из него
+                .setCacheMode(CacheMode.REFRESH)
+                .setHibernateFlushMode(FlushMode.COMMIT)
+    // сущности и коллекции помечаюся как только для чтения
+                .setReadOnly(true);
+        List <AirportEntity> airportEntityList=(List <AirportEntity>)query.list();
+        for (AirportEntity a:airportEntityList) {
+            airports.add(AirportConverter.fromEntity(a));
         }
         return airports;
     }
+
     public Airport getAirportById(int airportId) {
+        final Session session = HibernateUtil.getSession();
+        Query query = session.createQuery("from AirportEntity where id=:paramId");
+        query.setParameter("paramId", airportId);
+        query.setTimeout(1000).setCacheable(true)
+                // добавлять в кэш, но не считывать из него
+                .setCacheMode(CacheMode.REFRESH)
+                .setHibernateFlushMode(FlushMode.COMMIT)
+                // сущности и коллекции помечаюся как только для чтения
+                .setReadOnly(true);
+        return AirportConverter.fromEntity((AirportEntity) query.uniqueResult());
+    }
+ /*   public Airport getAirportById(int airportId) {
          try {
             Connection connection = DataSource.getInstance().getConnection();
             PreparedStatement ps = connection.prepareStatement("select t.* from myapp.airport t  where t.airportid=?");
@@ -140,12 +140,12 @@ public class AirportDao implements IAirportDao {
                 final Airport airport = new Airport(
                         rs.getInt("airportid"),
                         rs.getString("airportname"),
-                        rs.getInt("actfl")==1?true:false);
+                        rs.getInt("actfl") == 1);
                 return airport;
             }else             {return null;}
 
         }catch (SQLException e){
             throw new RuntimeException(e);
         }
-    }
+    }*/
 }

@@ -5,7 +5,7 @@ import com.github.nechai.aeroflot.model.Airport;
 import java.util.List;
 
 public interface IAirportService {
-    boolean addAirport(Airport airport);
+    int addAirport(Airport airport);
     boolean updateAirport(Airport airport);
     boolean deleteAirport(Airport airport);
     boolean deleteAirport(int airportId);

@@ -9,7 +9,7 @@ public class AirportService implements IAirportService {
     AirportDao airportDao =AirportDao.getInstance();
     private static volatile IAirportService instance;
 
-    private void AirportService(){
+    private AirportService(){
     }
 
     public static IAirportService getInstance() {
@@ -17,16 +17,14 @@ public class AirportService implements IAirportService {
         if (localInstance == null) {
             synchronized (IAirportService.class) {
                 localInstance = instance;
-                if (localInstance == null) {
-                    instance = localInstance = (IAirportService) new AirportService();
-                }
+                if (localInstance == null) instance = localInstance = new AirportService();
             }
         }
         return localInstance;
     }
 
     @Override
-    public boolean addAirport(Airport airport) {
+    public int addAirport(Airport airport) {
         return airportDao.insert(airport);
     }
 
