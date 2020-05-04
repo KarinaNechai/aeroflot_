@@ -6,6 +6,9 @@
     <persistence-unit name="TEST-UNIT" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <class> com.github.nechai.aeroflot.dao.entity.AirportEntity</class>
+        <class> com.github.nechai.aeroflot.dao.entity.WorkerEntity</class>
+        <class> com.github.nechai.aeroflot.dao.entity.ProfessionEntity</class>
+        <class> com.github.nechai.aeroflot.dao.entity.PlaneEntity</class>
         <exclude-unlisted-classes>true</exclude-unlisted-classes>
         <properties>
             <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>

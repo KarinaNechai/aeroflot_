@@ -4,10 +4,10 @@ import com.github.nechai.aeroflot.model.User;
 import java.util.List;
 
 public interface IUserDao {
-    boolean insert(User user);
-    boolean update(User user);
-    boolean delete(String login);
-    boolean delete (User user);
+    int save(User user);
+ //   int update(User user);
+    int delete(String login);
+    int delete (User user);
     User getUserBylogin(String login);
     List <User> getUsersByRole(Role role);
     User login(String login,String password);

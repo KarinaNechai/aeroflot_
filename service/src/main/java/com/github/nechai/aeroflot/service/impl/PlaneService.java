@@ -7,7 +7,7 @@ import com.github.nechai.aeroflot.service.IPlaneService;
 import java.util.List;
 
 public class PlaneService implements IPlaneService {
-    PlaneDao planeDao = PlaneDao.getInstance().getInstance();
+    PlaneDao planeDao = PlaneDao.getInstance();
     private static volatile IPlaneService instance;
     private void PlaneService(){
     }
@@ -25,22 +25,22 @@ public class PlaneService implements IPlaneService {
         return localInstance;
     }
     @Override
-    public boolean addPlane(Plane plane) {
-        return planeDao.insert(plane);
+    public int addPlane(Plane plane) {
+        return planeDao.save(plane);
     }
 
     @Override
-    public boolean update(Plane plane) {
-        return planeDao.update(plane);
+    public int update(Plane plane) {
+        return planeDao.save(plane);
     }
 
     @Override
-    public boolean delete(Plane plane) {
+    public int delete(Plane plane) {
         return planeDao.delete(plane);
     }
 
     @Override
-    public boolean delete(int planeId) {
+    public int delete(int planeId) {
         return planeDao.delete(planeId);
     }
 

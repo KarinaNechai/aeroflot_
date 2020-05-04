@@ -1,13 +1,14 @@
 package com.github.nechai.aeroflot.dao.impl;
 
-import com.github.nechai.aeroflot.dao.DataSource;
+import com.github.nechai.aeroflot.dao.HibernateUtil;
 import com.github.nechai.aeroflot.dao.IPlaneDao;
+import com.github.nechai.aeroflot.dao.converter.PlaneConverter;
+import com.github.nechai.aeroflot.dao.entity.PlaneEntity;
 import com.github.nechai.aeroflot.model.Plane;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import org.hibernate.CacheMode;
+import org.hibernate.FlushMode;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,115 +30,54 @@ public class PlaneDao implements IPlaneDao {
         return localInstance;
     }
 
-    @Override
-    public boolean insert(Plane plane) {
-    String str= "INSERT INTO myapp.plane (planename,capacity,length) VALUES (?,?,?)";
-       try {
-            Connection connection = DataSource.getInstance().getConnection();
-            PreparedStatement ps = connection.prepareStatement(str);
-            ps.setString(1, plane.getPlaneName()!=null?plane.getPlaneName():"");
-            ps.setInt(2, plane.getCapacity());
-            ps.setInt(3, plane.getRange());
-            return (ps.executeUpdate() == 1);
-        }catch (SQLException e)
-        {throw new RuntimeException(e);
-        }
+     public int save(Plane plane){
+        PlaneEntity planeEntity = PlaneConverter.toEntity(plane);
+        final Session session = HibernateUtil.getSession();
+        session.beginTransaction();
+        session.saveOrUpdate(planeEntity);
+        session.getTransaction().commit();
+        return planeEntity.getId();
     }
-    private int getId (Plane plane){
-        try {
-            String str="select t.planeid from myapp.plane t where t.planename=?";
-            Connection connection = DataSource.getInstance().getConnection();
-            PreparedStatement ps = connection.prepareStatement(str);
-            ps.setString(1, plane.getPlaneName() != null ? plane.getPlaneName() : "");
-            ResultSet rs = ps.executeQuery();
-            return (rs.next()?rs.getInt("planeid"):-1) ;
-        }catch (SQLException e){
-            throw new RuntimeException(e);
-        }
-    }
-
-
     @Override
-    public boolean update(Plane plane) {
-        if (plane==null) return false;
-        int planeId=plane.getPlaneId();
-    //    int actFl=plane.isActual()?1:0;
-    //    if (planeId==-1 ) return false;
-         String str= "update myapp.plane set planename=?,capacity=?,length=?,actfl=? where planeid=?";
-        try {
-            Connection connection = DataSource.getInstance().getConnection();
-            PreparedStatement ps = connection.prepareStatement(str);
-            ps.setString(1, plane.getPlaneName() != null ? plane.getPlaneName() : "");
-            ps.setInt(2, plane.getCapacity());
-            ps.setInt(3, plane.getRange());
-            ps.setInt(4,plane.isActual()?1:0);
-            ps.setInt(5,planeId);
-           return (1 != ps.executeUpdate());
-        }catch (SQLException e){
-            throw new RuntimeException(e);
-        }
-
-    }
-
-    @Override
-    public boolean delete(Plane plane) {
-        int planeId=getId(plane);
-        if (planeId==-1 ) return true;
+    public int delete(Plane plane) {
         plane.setActual(false);
-        return update(plane);
+        return save(plane);
     }
     public Plane getPlaneById(int planeId) {
-        try {
-            Connection connection = DataSource.getInstance().getConnection();
-            PreparedStatement ps = connection.prepareStatement(
-                    "select t.*  from myapp.plane t where t.actfl=1 and t.planeid=?"
-            );
-            ps.setInt(1, planeId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                final Plane plane = new Plane(
-                        rs.getInt("planeId"),
-                        rs.getString("planename"),
-                        rs.getInt("capacity"),
-                        rs.getInt("length"),
-                        (rs.getInt("actfl") == 1)
-                );
-                return plane;
-            } else {
-                return null;
-            }
-        }catch(SQLException e){
-            throw new RuntimeException(e);
-        }
+        final Session session = HibernateUtil.getSession();
+        Query query = session.createQuery("from PlaneEntity where id=:paramId");
+        query.setParameter("paramId", planeId);
+        query.setTimeout(1000).setCacheable(true)
+                // добавлять в кэш, но не считывать из него
+                .setCacheMode(CacheMode.REFRESH)
+                .setHibernateFlushMode(FlushMode.COMMIT)
+                // сущности и коллекции помечаюся как только для чтения
+                .setReadOnly(true);
+        return PlaneConverter.fromEntity((PlaneEntity) query.uniqueResult());
     }
 
-    public boolean delete(int planeId) {
+    public int delete(int planeId) {
         Plane plane=getPlaneById(planeId);
         plane.setActual(false);
-        return update(plane);
+        return save(plane);
     }
 
     @Override
     public List<Plane> getListPlane() {
         List <Plane> planes= new ArrayList<>();
-        try {
-            Connection connection = DataSource.getInstance().getConnection();
-            PreparedStatement ps = connection.prepareStatement("select t.* from myapp.plane t  where t.actfl=?");
-            ps.setInt(1, 1);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-              final Plane plane = new Plane(
-                        rs.getInt("planeid"),
-                        rs.getString("planename"),
-                        rs.getInt("capacity"),
-                        rs.getInt("length"),
-                        rs.getInt("actfl") == 1);
-                        planes.add(plane);
-            }
-        }catch (SQLException e){
-            throw new RuntimeException(e);
+        final Session session = HibernateUtil.getSession();
+        Query query = session.createQuery("from PlaneEntity where actFl=:paramActFl");
+        query.setParameter("paramActFl", 1);
+        query.setTimeout(1000).setCacheable(true)
+                // добавлять в кэш, но не считывать из него
+                .setCacheMode(CacheMode.REFRESH)
+                .setHibernateFlushMode(FlushMode.COMMIT)
+                // сущности и коллекции помечаюся как только для чтения
+                .setReadOnly(true);
+        List <PlaneEntity> planeEntityList=(List <PlaneEntity>)query.list();
+        for (PlaneEntity p:planeEntityList) {
+            planes.add(PlaneConverter.fromEntity(p));
         }
         return planes;
     }
-
 }

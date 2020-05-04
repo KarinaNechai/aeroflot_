@@ -20,7 +20,7 @@ public class WorkerService implements IWorkerService {
             synchronized (IWorkerService.class) {
                 localInstance = instance;
                 if (localInstance == null) {
-                    instance = localInstance = (IWorkerService) new WorkerService();
+                    instance = localInstance = new WorkerService();
                 }
             }
         }
@@ -28,22 +28,22 @@ public class WorkerService implements IWorkerService {
     }
 
     @Override
-    public boolean addWorker(Worker worker) {
-        return workerDao.insert(worker);
+    public int addWorker(Worker worker) {
+        return workerDao.save(worker);
     }
 
     @Override
-    public boolean updateWorker(Worker worker) {
-        return workerDao.update(worker);
+    public int updateWorker(Worker worker) {
+        return workerDao.save(worker);
     }
 
     @Override
-    public boolean deleteWorker(Worker worker) {
+    public int deleteWorker(Worker worker) {
         return workerDao.delete(worker);
     }
 
     @Override
-    public boolean deleteWorker(int workerId) {
+    public int deleteWorker(int workerId) {
             return workerDao.delete(workerId);
     }
 

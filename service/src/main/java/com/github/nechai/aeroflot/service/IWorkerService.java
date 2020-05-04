@@ -4,11 +4,11 @@ import com.github.nechai.aeroflot.model.Worker;
 import java.util.List;
 
 public interface IWorkerService {
-    boolean addWorker(Worker worker);
-    boolean updateWorker(Worker worker);
-    boolean deleteWorker(Worker worker);
-    boolean deleteWorker(int workerId);
-    public Worker getWorkerById(int workerId);
+    int addWorker(Worker worker);
+    int updateWorker(Worker worker);
+    int deleteWorker(Worker worker);
+    int deleteWorker(int workerId);
+    Worker getWorkerById(int workerId);
     List<Worker> getWorkersOfSystem();
     List<Worker> getWorkersByProfession(Profession profession);
 }

@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface IAirportService {
     int addAirport(Airport airport);
-    boolean updateAirport(Airport airport);
-    boolean deleteAirport(Airport airport);
-    boolean deleteAirport(int airportId);
+    int updateAirport(Airport airport);
+    int deleteAirport(Airport airport);
+    int deleteAirport(int airportId);
 
     Airport getAirportById(int airportId);
 

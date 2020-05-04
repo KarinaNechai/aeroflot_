@@ -25,8 +25,8 @@ public class WorkerServiceTest {
     private WorkerDao workerDao;
     @Test
     public void deleteWorker() {
-        Mockito.when(workerDao.delete(any())).thenReturn(true);
-        assertTrue(workerService.deleteWorker(new Worker("WorkerSurname", "WorkeFirstname",
+        Mockito.when(workerDao.delete(any())).thenReturn(1);
+        assertEquals(1,workerService.deleteWorker(new Worker("WorkerSurname", "WorkeFirstname",
                 "WorkerPatronomic", Profession.RADIOMAN)));
     }
 

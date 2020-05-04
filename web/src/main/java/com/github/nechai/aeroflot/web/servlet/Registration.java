@@ -16,7 +16,7 @@ public class Registration extends HttpServlet {
     private UserService userService = (UserService) UserService.getInstance();
 
     @Override
-    protected void doGet(HttpServletRequest rq, HttpServletResponse rs) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest rq, HttpServletResponse rs) throws ServletException {
         Object authUser = rq.getSession().getAttribute("authUser");
         if (authUser == null) {
             try {
@@ -43,8 +43,8 @@ public class Registration extends HttpServlet {
             String email = rq.getParameter("email");
             String telephone = rq.getParameter("telephone");
             User user=new User(firstName,lastName,telephone,email,login,password, Role.USER);
-            boolean isAddUser= userService.addUser(user);
-            if (isAddUser) {
+            int idAddUser= userService.addUser(user);
+            if (idAddUser!=-1) {
                 try {
                     rq.setAttribute("userSave",user);
                     rq.getRequestDispatcher("successRegistration.jsp").forward(rq,rs);
@@ -52,7 +52,7 @@ public class Registration extends HttpServlet {
                     throw new RuntimeException(e);
                 }
             }
-            if (!isAddUser) {
+            if (idAddUser==-1) {
                 try {
                     rs.sendRedirect(rq.getContextPath() +"/login");
                 } catch (IOException e) {

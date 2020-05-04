@@ -4,10 +4,10 @@ import com.github.nechai.aeroflot.model.Airport;
 import java.util.List;
 
 public interface IAirportDao {
-    int insert (Airport airport);
-    boolean update(Airport airport);
-    boolean delete(Airport airport);
-    boolean delete(int airportId);
+  //  int insert (Airport airport);
+    int save (Airport airport);
+    int delete(Airport airport);
+    int delete(int airportId);
     List<Airport> getListAirport();
 
 }

@@ -25,22 +25,22 @@ public class AirportService implements IAirportService {
 
     @Override
     public int addAirport(Airport airport) {
-        return airportDao.insert(airport);
+        return airportDao.save(airport);
     }
 
     @Override
-    public boolean updateAirport(Airport airport)
+    public int updateAirport(Airport airport)
     {
-        return airportDao.update(airport);
+        return airportDao.save(airport);
     }
 
     @Override
-    public boolean deleteAirport(Airport airport) {
+    public int deleteAirport(Airport airport) {
         return airportDao.delete(airport);
     }
 
     @Override
-    public boolean deleteAirport(int airportId) {
+    public int deleteAirport(int airportId) {
         return airportDao.delete(airportId);
     }
     @Override

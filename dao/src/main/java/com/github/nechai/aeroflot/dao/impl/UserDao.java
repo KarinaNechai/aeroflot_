@@ -1,9 +1,20 @@
 package com.github.nechai.aeroflot.dao.impl;
 
 import com.github.nechai.aeroflot.dao.DataSource;
+import com.github.nechai.aeroflot.dao.HibernateUtil;
 import com.github.nechai.aeroflot.dao.IUserDao;
+import com.github.nechai.aeroflot.dao.converter.PlaneConverter;
+import com.github.nechai.aeroflot.dao.converter.RoleConverter;
+import com.github.nechai.aeroflot.dao.converter.UserConverter;
+import com.github.nechai.aeroflot.dao.entity.PlaneEntity;
+import com.github.nechai.aeroflot.dao.entity.RoleEntity;
+import com.github.nechai.aeroflot.dao.entity.UserEntity;
 import com.github.nechai.aeroflot.model.Role;
 import com.github.nechai.aeroflot.model.User;
+import org.hibernate.CacheMode;
+import org.hibernate.FlushMode;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -30,48 +41,16 @@ public class UserDao implements IUserDao {
     }
 
     @Override
-    public boolean insert(User user) {
-       String str= "INSERT INTO myapp.user (userfirstname,usersurname,userphone,email,userlogin,userpassword,userrole) VALUES (?,?,?,?,?,?,?)";
-       try {
-           int roleid=getRoleId(user.getRole());
-           Connection connection = DataSource.getInstance().getConnection();
-           PreparedStatement ps = connection.prepareStatement(str);
-           ps.setString(1, user.getFirstName() != null ? user.getFirstName() : "");
-           ps.setString(2, user.getLastName() != null ? user.getLastName() : "");
-           ps.setString(3, user.getPhone() != null ? user.getPhone() : "");
-           ps.setString(4, user.getEmail() != null ? user.getEmail() : "");
-           ps.setString(5, user.getLogin() != null ? user.getLogin() : "");
-           ps.setString(6,user.getPassword() != null ? user.getPassword() : "");
-           ps.setInt(7, roleid);
-           if(ps.executeUpdate() == 1){
-               boolean res=true;
-               return true;
-           }
-           else{
-               return false;
-           }
-       }catch (SQLException e)
-       {throw new RuntimeException(e);
-       }
+    public int save(User user) {
+        UserEntity userEntity= UserConverter.toEntity(user);
+        final Session session = HibernateUtil.getSession();
+        session.beginTransaction();
+        session.saveOrUpdate(userEntity);
+        session.getTransaction().commit();
+        return userEntity.getId();
     }
 
-    private int getUserid (User user){
-        int userId=-1;
-        try {
-            String str="select t.userid from myapp.user t where t.userlogin=?";
-            Connection connection = DataSource.getInstance().getConnection();
-            PreparedStatement ps = connection.prepareStatement(str);
-            ps.setString(1, user.getLogin() != null ? user.getLogin() : "");
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                userId=rs.getInt("userid");
-                 }
-        }catch (SQLException e){
-            throw new RuntimeException(e);
-        }
-        return userId;
-    }
-    private int getRoleUserId (User user){
+ /*    private int getRoleUserId (User user){
         int roleId=-1;
         try {
             String str="select t.userrole from myapp.user t where t.userlogin=?";
@@ -86,8 +65,8 @@ public class UserDao implements IUserDao {
             throw new RuntimeException(e);
         }
         return roleId;
-    }
-    private int getRoleId (Role role){
+    }*/
+  /*  private int getRoleId (Role role){
         int roleId=-1;
         try {
             String str="select  t.clasid from myapp.classifier t where  t.clascode=? AND t.clasval=?";
@@ -104,8 +83,8 @@ public class UserDao implements IUserDao {
             throw new RuntimeException(e);
         }
         return roleId;
-    }
-    private boolean isExist (User user){
+    }*/
+ /*   private boolean isExist (User user){
         try {
             String str="select * from myapp.user t where t.userlogin=?";
             Connection connection = DataSource.getInstance().getConnection();
@@ -116,9 +95,9 @@ public class UserDao implements IUserDao {
         }catch (SQLException e){
             throw new RuntimeException(e);
         }
-    }
+    }*/
 
-    @Override
+/*    @Override
     public boolean update(User user) {
         if (user==null) return false;
  //       if (!isExist(user) ) return false;
@@ -147,95 +126,62 @@ public class UserDao implements IUserDao {
         }catch (SQLException e){
             throw new RuntimeException(e);
         }
+    }*/
+
+    @Override
+    public int delete(String login) {
+        User resultUser= getUserBylogin(login);
+        if  (resultUser==null) return -1;
+        resultUser.setActual(false);
+        return save( resultUser);
     }
 
     @Override
-    public boolean delete(String login) {
-        User resultUser= getUserBylogin(login);
-        if  (resultUser==null) return false;
-        resultUser.setActual(false);
-        return update( resultUser);
-    }
-
-       @Override
-    public boolean delete(User user) {
-        boolean result;
-        int userId = getUserid(user);
-        String str = "delete from myapp.user where userid=?";
-        try {
-            Connection connection = DataSource.getInstance().getConnection();
-            PreparedStatement rs = connection.prepareStatement(str);
-            rs.setInt(1, userId);
-            result = (rs.executeUpdate() == 1);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return result;
+    public int delete(User user) {
+           user.setActual(false);
+           return save(user);
     }
 
     @Override
     public User getUserBylogin(String login) {
-    try {
-        Connection connection = DataSource.getInstance().getConnection();
-        PreparedStatement ps = connection.prepareStatement("select t.*,c.clasval from myapp.user t, myapp.classifier c where t.userrole=c.clasid and t.userlogin=?");
-        ps.setString(1, login);
-        ResultSet rs = ps.executeQuery();
-        if (rs.next())  {
-            String q=rs.getString("clasval");
-             Role role=Role.valueOf(q);
-              final User user = new User(
-                        rs.getInt("userid"),
-                        rs.getString("userfirstname"),
-                        rs.getString("usersurname"),
-                        rs.getString("userphone"),
-                        rs.getString("email"),
-                        rs.getString("userlogin"),
-                        rs.getString("userpassword"),
-                        Role.valueOf(rs.getString("clasval")),
-                        rs.getInt("actfl")==1?true:false            );
-              return user;
-        }
-        else {
-            return null;
-        }
-    }catch (SQLException e){
-        throw new RuntimeException(e);
-    }
+    final Session session=HibernateUtil.getSession();
+    Query query=session.createQuery("from UserEntity where login=:paramLogin");
+    query.setParameter("paramLogin",login);
+        query.setTimeout(1000).setCacheable(true)
+                // добавлять в кэш, но не считывать из него
+                .setCacheMode(CacheMode.REFRESH)
+                .setHibernateFlushMode(FlushMode.COMMIT)
+                // сущности и коллекции помечаюся как только для чтения
+                .setReadOnly(true);
+        return UserConverter.fromEntity((UserEntity) query.uniqueResult());
     }
 
     @Override
     public List<User> getUsersByRole(Role role) {
-       int roleId=getRoleId(role);
-       List <User> users=new ArrayList<>();
-        try {
-            Connection connection = DataSource.getInstance().getConnection();
-            PreparedStatement ps = connection.prepareStatement(" select t.*,c.clasval from myapp.user t," +
-                    " myapp.classifier c where  (t.userrole=c.clasid and t.userrole=?) and t.actfl=1");
-            ps.setInt(1, roleId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                final User user = new User(
-                        rs.getString("userfirstname"),
-                        rs.getString("usersurname"),
-                        rs.getString("userphone"),
-                        rs.getString("email"),
-                        rs.getString("userlogin"),
-                        rs.getString("userpassword"),
-                        Role.valueOf(rs.getString("clasval")));
-                users.add(user);
-            }
-
-        }catch (SQLException e){
-            throw new RuntimeException(e);
+        RoleEntity roleEntity= RoleConverter.toEntity(role);
+         List <User> users=new ArrayList<>();
+         final Session session=HibernateUtil.getSession();
+         Query query=session.createQuery("from UserEntity where role=:paramRole and actFl=:paramActFl");
+         query.setParameter("paramRole",roleEntity);
+        query.setParameter("paramActFl",1);
+         query.setTimeout(1000).setCacheable(true)
+                // добавлять в кэш, но не считывать из него
+                .setCacheMode(CacheMode.REFRESH)
+                .setHibernateFlushMode(FlushMode.COMMIT)
+                // сущности и коллекции помечаюся как только для чтения
+                .setReadOnly(true);
+        List <UserEntity> userEntityList=query.list();
+        for (UserEntity u:userEntityList) {
+            users.add(UserConverter.fromEntity(u));
         }
         return users;
     }
 
     @Override
     public User login(String login, String password) {
-        User user=getUserBylogin(login);
-        if (user==null) return null;
-        return user.getPassword().equals(password)?user:null;
+         User user=getUserBylogin(login);
+         if (user==null) return null;
+         return user.getPassword().equals(password)?user:null;
     }
 
 }

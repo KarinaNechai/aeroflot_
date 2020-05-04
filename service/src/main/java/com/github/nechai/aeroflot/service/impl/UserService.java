@@ -27,17 +27,17 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public boolean addUser(User user) {
-        return userDao.insert(user);
+    public int addUser(User user) {
+        return userDao.save(user);
     }
 
     @Override
-    public boolean updateUser(User user) {
-        return userDao.update(user);
+    public int updateUser(User user) {
+        return userDao.save(user);
     }
 
     @Override
-    public boolean deleteUser(String login) {
+    public int deleteUser(String login) {
             return userDao.delete(login);
     }
 

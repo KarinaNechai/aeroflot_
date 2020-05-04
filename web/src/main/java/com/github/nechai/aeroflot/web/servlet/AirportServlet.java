@@ -34,7 +34,7 @@ public class AirportServlet extends HttpServlet {
         {
             try{
             int airportId=Integer.parseInt(rq.getParameter("Update"));
-           Airport airportUp=airportService.getAirportById(airportId);
+            Airport airportUp=airportService.getAirportById(airportId);
             rq.setAttribute("airportUp", airportUp);
             rq.getRequestDispatcher("addairport.jsp").forward(rq,rs);
         } catch (IOException | ServletException e) {

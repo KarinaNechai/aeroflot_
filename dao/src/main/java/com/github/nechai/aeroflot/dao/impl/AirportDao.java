@@ -30,73 +30,25 @@ public class AirportDao implements IAirportDao {
         return localInstance;
     }
 
-
     @Override
-    public int insert(Airport airport) {
+    public int save(Airport airport) {
         AirportEntity airportEntity = AirportConverter.toEntity(airport);
         final Session session = HibernateUtil.getSession();
         session.beginTransaction();
-        session.save(airportEntity);
+        session.saveOrUpdate(airportEntity);
         session.getTransaction().commit();
         return airportEntity.getId();
     }
 
- /*   private int getId(Airport airport) {
-        try {
-            String str = "select t.airportid from myapp.airport t where t.airportname=?";
-            Connection connection = DataSource.getInstance().getConnection();
-            PreparedStatement ps = connection.prepareStatement(str);
-            ps.setString(1, airport.getName() != null ? airport.getName() : "");
-            ResultSet rs = ps.executeQuery();
-            return (rs.next() ? rs.getInt("airportid") : -1);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-*/
-
-    @Override
-    public boolean update(Airport airport){
-     AirportEntity airportEntity = AirportConverter.toEntity(airport);
-     final Session session = HibernateUtil.getSession();
-     session.beginTransaction();
-     session.saveOrUpdate(airportEntity);
-     session.getTransaction().commit();
-     return true;
-}
-  /*  @Override
-    public boolean update(Airport airport) {
-        if (airport==null) return false;
-        int airportId=airport.getId();
-        int actFl=airport.isActual()?1:0;
-        if (airportId==-1 ) return false;
-        String str= "update myapp.airport set airportname=?, actfl=? where airportid=?";
-        try {
-            Connection connection = DataSource.getInstance().getConnection();
-            PreparedStatement ps = connection.prepareStatement(str);
-            ps.setString(1, airport.getName() != null ? airport.getName() : "");
-            ps.setInt(2, actFl);
-            ps.setInt(3, airportId);
-            if (1 != ps.executeUpdate()) {
-                return false;
-            } else {
-                boolean res=true;
-                return true;
-            }
-        }catch (SQLException e){
-            throw new RuntimeException(e);
-        }
-    }
-*/
-    @Override
-    public boolean delete(Airport airport) {
+     @Override
+    public int delete(Airport airport) {
         airport.setActual(false);
-        return update(airport);
+        return save(airport);
     }
 
     @Override
-    public boolean delete(int airportId) {
-        return delete(getAirportById(airportId));
+    public int delete(int airportId) {
+        return save(getAirportById(airportId));
     }
 
     @Override
@@ -130,22 +82,4 @@ public class AirportDao implements IAirportDao {
                 .setReadOnly(true);
         return AirportConverter.fromEntity((AirportEntity) query.uniqueResult());
     }
- /*   public Airport getAirportById(int airportId) {
-         try {
-            Connection connection = DataSource.getInstance().getConnection();
-            PreparedStatement ps = connection.prepareStatement("select t.* from myapp.airport t  where t.airportid=?");
-            ps.setInt(1, airportId);
-            ResultSet rs = ps.executeQuery();
-             if (rs.next()) {
-                final Airport airport = new Airport(
-                        rs.getInt("airportid"),
-                        rs.getString("airportname"),
-                        rs.getInt("actfl") == 1);
-                return airport;
-            }else             {return null;}
-
-        }catch (SQLException e){
-            throw new RuntimeException(e);
-        }
-    }*/
-}
+ }

@@ -20,13 +20,13 @@ class PlaneServiceTest {
 
     @Test
     public void addPlane() {
-        Mockito.when(planeDao.insert(any())).thenReturn(true);
-        assertTrue(planeService.addPlane(new Plane("Boing")));
+        Mockito.when(planeDao.save(any())).thenReturn(1);
+        assertEquals(1,planeService.addPlane(new Plane("Boing")));
     }
 
     @Test
     public void delete() {
-        Mockito.when(planeDao.delete(any())).thenReturn(true);
-        assertTrue(planeService.delete(new Plane("Tu")));
+        Mockito.when(planeDao.delete(any())).thenReturn(2);
+        assertEquals(2,planeService.delete(new Plane("Tu")));
     }
 }

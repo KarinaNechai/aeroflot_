@@ -21,8 +21,8 @@ public class UserServiceTest {
     private UserDao userDao;
     @Test
     public void addUser() {
-        Mockito.when(userDao.insert(any())).thenReturn(true);
-        Mockito.when(userDao.insert(null)).thenReturn(false);
+        Mockito.when(userDao.save(any())).thenReturn(1);
+        Mockito.when(userDao.save(null)).thenReturn(-1);
         UserService userService = (UserService) UserService.getInstance();
         User user=new User(
                 "TestUserName",
@@ -33,8 +33,8 @@ public class UserServiceTest {
                 "TestUserPass",
                 Role.DISPATCHER
         );
-        assertTrue(userService.addUser(user));
-        assertFalse(userService.addUser(null));
+        assertEquals(1,userService.addUser(user));
+        assertEquals(-1,userService.addUser(null));
     }
 
     @Test
