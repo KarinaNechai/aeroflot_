@@ -9,9 +9,7 @@ import com.github.nechai.aeroflot.dao.converter.WorkerConverter;
 import com.github.nechai.aeroflot.dao.entity.AirportEntity;
 import com.github.nechai.aeroflot.dao.entity.ProfessionEntity;
 import com.github.nechai.aeroflot.dao.entity.WorkerEntity;
-import com.github.nechai.aeroflot.model.Airport;
-import com.github.nechai.aeroflot.model.Profession;
-import com.github.nechai.aeroflot.model.Worker;
+import com.github.nechai.aeroflot.model.*;
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
@@ -87,21 +85,20 @@ public class WorkerDao implements IWorkerDao {
     public Worker getWorkerById(int workerId) {
 
         final Session session = HibernateUtil.getSession();
-            Query query = session.createQuery("from WorkerEntity where id=:paramId");
-            query.setParameter("paramId", workerId);
-            query.setTimeout(1000).setCacheable(true)
-                    // добавлять в кэш, но не считывать из него
-                    .setCacheMode(CacheMode.REFRESH)
-                    .setHibernateFlushMode(FlushMode.COMMIT)
-                    // сущности и коллекции помечаюся как только для чтения
-                    .setReadOnly(true);
-            return WorkerConverter.fromEntity((WorkerEntity) query.uniqueResult());
+        Query query = session.createQuery("from WorkerEntity where id=:paramId");
+        query.setParameter("paramId", workerId);
+        query.setTimeout(1000).setCacheable(true)
+                // добавлять в кэш, но не считывать из него
+                .setCacheMode(CacheMode.REFRESH)
+                .setHibernateFlushMode(FlushMode.COMMIT)
+                // сущности и коллекции помечаюся как только для чтения
+                .setReadOnly(true);
+        return WorkerConverter.fromEntity((WorkerEntity) query.uniqueResult());
     }
 
-
     @Override
-    public int save (Worker worker) {
-        WorkerEntity workerEntity=WorkerConverter.toEntity(worker);
+    public int save(Worker worker) {
+        WorkerEntity workerEntity = WorkerConverter.toEntity(worker);
         final Session session = HibernateUtil.getSession();
         session.beginTransaction();
         session.saveOrUpdate(workerEntity);
@@ -117,16 +114,16 @@ public class WorkerDao implements IWorkerDao {
 
     @Override
     public int delete(int workerId) {
-        Worker worker=getWorkerById(workerId);
+        Worker worker = getWorkerById(workerId);
         worker.setActual(false);
         return save(worker);
     }
 
     @Override
     public List<Worker> getWorkersOfSystem() {
-        List <Worker> workers=new ArrayList<>();
+        List<Worker> workers = new ArrayList<>();
         final Session session = HibernateUtil.getSession();
-        Query query = session.createQuery("from WorkerEntity where actFl=:paramActFl");
+        Query query = session.createQuery("from WorkerEntity where actFl=:paramActFl order by workerSurname asc");
         query.setParameter("paramActFl", 1);
         query.setTimeout(1000).setCacheable(true)
                 // добавлять в кэш, но не считывать из него
@@ -134,19 +131,40 @@ public class WorkerDao implements IWorkerDao {
                 .setHibernateFlushMode(FlushMode.COMMIT)
                 // сущности и коллекции помечаюся как только для чтения
                 .setReadOnly(true);
-        List <WorkerEntity> workerEntityList=(List <WorkerEntity>)query.list();
-        for (WorkerEntity a:workerEntityList) {
+        List<WorkerEntity> workerEntityList = (List<WorkerEntity>) query.list();
+        for (WorkerEntity a : workerEntityList) {
             workers.add(WorkerConverter.fromEntity(a));
         }
-           return workers;
+        return workers;
     }
+
+    public List<Worker> getWorkersOfSystem(Page page) {
+        List<Worker> workers = new ArrayList<>();
+        final Session session = HibernateUtil.getSession();
+        Query query = session.createQuery("from WorkerEntity where actFl=:paramActFl order by workerSurname asc");
+        query.setParameter("paramActFl", 1);
+        query.setFirstResult(page.getFirst());
+        query.setMaxResults(page.getMax());
+        query.setTimeout(1000).setCacheable(true)
+                // добавлять в кэш, но не считывать из него
+                .setCacheMode(CacheMode.REFRESH)
+                .setHibernateFlushMode(FlushMode.COMMIT)
+                // сущности и коллекции помечаюся как только для чтения
+                .setReadOnly(true);
+        List<WorkerEntity> workerEntityList = (List<WorkerEntity>) query.list();
+        for (WorkerEntity a : workerEntityList) {
+            workers.add(WorkerConverter.fromEntity(a));
+        }
+        return workers;
+    }
+
 
     @Override
     public List<Worker> getWorkersByProfession(Profession profession) {
-        ProfessionEntity professionEntity= ProfessionConverter.toEntity(profession);
-        List <Worker> workers=new ArrayList<>();
+        ProfessionEntity professionEntity = ProfessionConverter.toEntity(profession);
+        List<Worker> workers = new ArrayList<>();
         final Session session = HibernateUtil.getSession();
-        Query query = session.createQuery("from WorkerEntity where actFl=:paramActFl and profession=:paramPr");
+        Query query = session.createQuery("from WorkerEntity where actFl=:paramActFl and profession=:paramPr order by workerSurname asc");
         query.setParameter("paramActFl", 1);
         query.setParameter("paramPr", professionEntity);
         query.setTimeout(1000).setCacheable(true)
@@ -155,10 +173,24 @@ public class WorkerDao implements IWorkerDao {
                 .setHibernateFlushMode(FlushMode.COMMIT)
                 // сущности и коллекции помечаюся как только для чтения
                 .setReadOnly(true);
-        List <WorkerEntity> workerEntityList=(List <WorkerEntity>)query.list();
-        for (WorkerEntity a:workerEntityList) {
+        List<WorkerEntity> workerEntityList = (List<WorkerEntity>) query.list();
+        for (WorkerEntity a : workerEntityList) {
             workers.add(WorkerConverter.fromEntity(a));
         }
         return workers;
-        }
+    }
+
+    public int getCountOfWorkers() {
+        final Session session = HibernateUtil.getSession();
+        Query query = session.createQuery("select count(*) from WorkerEntity where actFl=:paramActFl");
+        query.setParameter("paramActFl", 1);
+        query.setTimeout(1000).setCacheable(true)
+                // добавлять в кэш, но не считывать из него
+                .setCacheMode(CacheMode.REFRESH)
+                .setHibernateFlushMode(FlushMode.COMMIT).
+                // сущности и коллекции помечаюся как только для чтения
+                        setReadOnly(true);
+        long count = (Long) query.getSingleResult();
+        return (int) count;
+    }
 }

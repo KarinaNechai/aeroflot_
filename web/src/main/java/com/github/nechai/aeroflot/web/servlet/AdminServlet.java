@@ -1,7 +1,9 @@
 package com.github.nechai.aeroflot.web.servlet;
 
+import com.github.nechai.aeroflot.model.Page;
 import com.github.nechai.aeroflot.model.User;
 import com.github.nechai.aeroflot.service.impl.UserService;
+import com.github.nechai.aeroflot.web.WebUtils;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -11,50 +13,57 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet("/Admin")
+@WebServlet("/admin")
 public class AdminServlet extends HttpServlet {
     private UserService userService = (UserService) UserService.getInstance();
 
     @Override
     protected void doGet (HttpServletRequest rq, HttpServletResponse rs)  {
         Object authUser = rq.getSession().getAttribute("authUser");
-        getListUsers(rq, rs);
+        int pageN = 1;
+        if (rq.getParameter("page") != null) {
+            pageN = Integer.parseInt(rq.getParameter("page"));
+        }
+        getListUsers(rq, rs,pageN);
     }
 
     protected void doPost(HttpServletRequest rq, HttpServletResponse rs) throws ServletException, IOException {
-        String userLoginDel = rq.getParameter("Delete");
-        String userLoginUpdate = rq.getParameter("Update");
+        int pageN = 1;
+        if (rq.getParameter("pageN") != null) {
+            pageN = Integer.parseInt(rq.getParameter("pageN"));
+        }
         String userLoginSave = rq.getParameter("Save");
-        if (userLoginDel!=null)
+        if (rq.getParameter("Delete")!=null)
         {
-            userService.deleteUser( userLoginDel);
-            getListUsers(rq, rs);
+            int userId= Integer.parseInt(rq.getParameter("Delete"));
+            userService.delete( userId);
         }
-        if (userLoginUpdate!=null)
+        if (rq.getParameter("Update")!=null)
         {
-            rq.setAttribute("userUpdate",userService.getUser(userLoginUpdate));
-            rq.getRequestDispatcher("admin.jsp").forward(rq, rs);
+            int userId= Integer.parseInt(rq.getParameter("Update"));
+            rq.setAttribute("userUpdate",userService.getUserById(userId));
         }
-        if (userLoginSave!=null)
+        if (rq.getParameter("Save")!=null)
         {
-            userService.updateUser(userService.getUser(userLoginSave));
-            getListUsers(rq, rs);
+            int userId= Integer.parseInt(rq.getParameter("Save"));
+            userService.updateUser(userService.getUserById(userId));
         }
         if (rq.getParameter("Logout")!=null)
         {
             rq.getSession().setAttribute("authUser", null);
             rq.setAttribute("users", null);
-            rq.getRequestDispatcher("login.jsp").forward(rq, rs);
+            WebUtils.forword("login.jsp",rq, rs);
         }
+        getListUsers(rq, rs,pageN);
     }
-    protected void getListUsers(HttpServletRequest rq, HttpServletResponse rs){
-        try {
-            List<User> listUsers = userService.getUsersOfSystem();
-            rq.setAttribute("users", listUsers);
-            rq.getRequestDispatcher("admin.jsp").forward(rq, rs);
-        } catch (IOException | ServletException e) {
-            throw new RuntimeException(e);
-        }
+    protected void getListUsers(HttpServletRequest rq, HttpServletResponse rs, int pageN){
+        int noOfRecords = userService.getCountOfUsers();
+        int noOfPages = (int) Math.ceil(noOfRecords * 1.0 / Page.RECORD_NUMBER);
+        rq.setAttribute("noOfPages", noOfPages);
+        rq.setAttribute("currentPage", pageN);
+        List<User> listUsers = userService.getUsersOfSystem(new Page(pageN));
+        rq.setAttribute("users", listUsers);
+        WebUtils.forword("admin.jsp",rq, rs);
     }
 }
 

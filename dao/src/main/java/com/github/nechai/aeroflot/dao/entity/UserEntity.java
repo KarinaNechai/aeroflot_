@@ -84,9 +84,9 @@ public class UserEntity {
     public void setPassword(String password) {
         this.password = password;
     }
-    @OneToOne (fetch=FetchType.EAGER,
-            cascade=CascadeType.ALL)
-    @JoinColumn (name= "userrole")
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "userrole")
     public RoleEntity getRole() {
         return role;
     }
@@ -100,7 +100,7 @@ public class UserEntity {
         return actFl;
     }
 
-    public void setActFl(int actual) {
-        this.actFl = actual;
+    public void setActFl(int actFl) {
+        this.actFl = actFl;
     }
 }

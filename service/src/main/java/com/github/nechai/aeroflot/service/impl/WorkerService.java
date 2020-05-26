@@ -1,6 +1,7 @@
 package com.github.nechai.aeroflot.service.impl;
 
 import com.github.nechai.aeroflot.dao.impl.WorkerDao;
+import com.github.nechai.aeroflot.model.Page;
 import com.github.nechai.aeroflot.model.Profession;
 import com.github.nechai.aeroflot.model.Worker;
 import com.github.nechai.aeroflot.service.IWorkerService;
@@ -60,5 +61,15 @@ public class WorkerService implements IWorkerService {
     @Override
     public List<Worker> getWorkersByProfession(Profession profession) {
         return workerDao.getWorkersByProfession(profession);
+    }
+
+    @Override
+    public int getCountOfWorkers() {
+        return workerDao.getCountOfWorkers();
+    }
+
+    @Override
+    public List<Worker> getWorkersOfSystem(Page page) {
+        return workerDao.getWorkersOfSystem(page);
     }
 }

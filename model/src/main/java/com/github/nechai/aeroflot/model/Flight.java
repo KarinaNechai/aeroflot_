@@ -1,37 +1,49 @@
 package com.github.nechai.aeroflot.model;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 public class Flight {
     private int flightId;
-    private int airportFrom;
-    private int airportTo;
-    private int crewid;
-    private int planeid;
-    private int flightrange;
+    private Airport airportFrom;
+    private Airport airportTo;
+    private List<Worker> listWorker;
+    private Plane plane;
+    private int flightRange;
     private boolean isActual;
-    private int amountpassengers;
-    private Date datetime;
-    boolean actfl;
+    private int amountPassengers;
+    private LocalDateTime dateTime;
 
-    public Flight(int flightId, int airportFrom, int airportTo, int crewid, int planeid, int flightrange,
-                  int amountpassengers, Date datetime, boolean actfl) {
+
+    public Flight() {
+    }
+
+    public LocalDateTime getDateTime() {
+        return dateTime;
+    }
+
+    public void setDateTime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
+    }
+
+    public Flight(Airport airportFrom, Airport airportTo, LocalDateTime dateTime) {
+        this.airportFrom = airportFrom;
+        this.airportTo = airportTo;
+        this.dateTime = dateTime;
+        this.setActual(true);
+    }
+
+    public Flight(int flightId, Airport airportFrom, Airport airportTo, List<Worker> listWorker, Plane plane, int flightRange, boolean isActual, int amountPassengers, LocalDateTime dateTime) {
         this.flightId = flightId;
         this.airportFrom = airportFrom;
         this.airportTo = airportTo;
-        this.crewid = crewid;
-        this.planeid = planeid;
-        this.flightrange = flightrange;
-        this.amountpassengers = amountpassengers;
-        this.datetime = datetime;
-        this.actfl = actfl;
-    }
-
-    public Flight(int airportFrom, int airportTo, Date datetime) {
-        this.airportFrom = airportFrom;
-        this.airportTo = airportTo;
-        this.datetime = datetime;
+        this.listWorker = listWorker;
+        this.plane = plane;
+        this.flightRange = flightRange;
+        this.isActual = isActual;
+        this.amountPassengers = amountPassengers;
+        this.dateTime = dateTime;
     }
 
     public int getFlightId() {
@@ -42,44 +54,38 @@ public class Flight {
         this.flightId = flightId;
     }
 
-    public int getAirportFrom() {
+    public Airport getAirportFrom() {
+
         return airportFrom;
     }
 
-    public void setAirportFrom(int airportFrom) {
+    public void setAirportFrom(Airport airportFrom) {
         this.airportFrom = airportFrom;
     }
 
-    public int getAirportTo() {
+    public Airport getAirportTo() {
         return airportTo;
     }
 
-    public void setAirportTo(int airportTo) {
+    public void setAirportTo(Airport airportTo) {
         this.airportTo = airportTo;
     }
 
-    public int getCrewid() {
-        return crewid;
+    public Plane getPlane() {
+        return plane;
     }
 
-    public void setCrewid(int crewid) {
-        this.crewid = crewid;
+    public void setPlane(Plane plane) {
+
+        this.plane = plane;
     }
 
-    public int getPlaneid() {
-        return planeid;
+    public int getFlightRange() {
+        return flightRange;
     }
 
-    public void setPlaneid(int planeid) {
-        this.planeid = planeid;
-    }
-
-    public int getFlightrange() {
-        return flightrange;
-    }
-
-    public void setFlightrange(int flightrange) {
-        this.flightrange = flightrange;
+    public void setFlightRange(int flightrange) {
+        this.flightRange = flightrange;
     }
 
     public boolean isActual() {
@@ -90,27 +96,57 @@ public class Flight {
         isActual = actual;
     }
 
-     public int getAmountpassengers() {
-        return amountpassengers;
+
+
+    public LocalDateTime getDatetime() {
+        return dateTime;
     }
 
-    public void setAmountpassengers(int amountpassengers) {
-        this.amountpassengers = amountpassengers;
+    public void setDatetime(LocalDateTime dateTime) {
+        this.dateTime = dateTime;
     }
 
-    public Date getDatetime() {
-        return datetime;
+
+    public List<Worker> getListWorker() {
+        return listWorker;
     }
 
-    public void setDatetime(Date datetime) {
-        this.datetime = datetime;
+    public void setListWorker(List<Worker> listWorker) {
+        this.listWorker = listWorker;
     }
 
-    public boolean isActfl() {
-        return actfl;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Flight)) return false;
+        Flight flight = (Flight) o;
+        boolean q=getAirportFrom().equals(flight.getAirportFrom());
+        boolean q1=getAirportTo().equals(flight.getAirportTo());
+        boolean q2=Objects.equals(getListWorker(), flight.getListWorker());
+        boolean q3=Objects.equals(getPlane(), flight.getPlane());
+        boolean q4=getDatetime().equals(flight.getDatetime());
+
+        return getFlightId() == flight.getFlightId() &&
+                flightRange == flight.flightRange &&
+                isActual() == flight.isActual() &&
+                amountPassengers == flight.amountPassengers &&
+                getAirportFrom().equals(flight.getAirportFrom()) &&
+                getAirportTo().equals(flight.getAirportTo()) &&
+                Objects.equals(getListWorker(), flight.getListWorker()) &&
+                Objects.equals(getPlane(), flight.getPlane()) &&
+                getDatetime().equals(flight.getDatetime());
     }
 
-    public void setActfl(boolean actfl) {
-        this.actfl = actfl;
+    @Override
+    public int hashCode() {
+        return Objects.hash(getFlightId(), getAirportFrom(), getAirportTo(), getListWorker(), getPlane(), flightRange, isActual(), amountPassengers, getDatetime());
+    }
+
+    public int getAmountPassengers() {
+        return amountPassengers;
+    }
+
+    public void setAmountPassengers(int amountPassengers) {
+        this.amountPassengers = amountPassengers;
     }
 }

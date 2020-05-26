@@ -1,26 +1,21 @@
 package com.github.nechai.aeroflot.model;
 
+import java.util.Objects;
+
 public class Plane {
-      private int planeId;
-      private String planeName;
-      private int capacity;//вместимость
-      private int range;//дальность полета',
-      private boolean isActual;
+    private int planeId;
+    private String planeName;
+    private int capacity;//вместимость
+    private int range;//дальность полета',
+    private boolean isActual;
 
     public Plane(String newPlaneName, int newCapasity, int newRange) {
         this.planeName = newPlaneName;
         this.capacity = newCapasity;
         this.range = newRange;
-        this.isActual=true;
+        this.isActual = true;
     }
 
-    public boolean isActual() {
-        return isActual;
-    }
-
-    public void setActual(boolean actual) {
-        isActual = actual;
-    }
 
     public Plane() {
     }
@@ -30,11 +25,12 @@ public class Plane {
         this.planeName = planeName;
         this.capacity = capacity;
         this.range = range;
-        this.isActual=isActual;
+        this.isActual = isActual;
     }
 
     public Plane(String planeName) {
         this.planeName = planeName;
+        this.isActual =true;
     }
 
     public int getPlaneId() {
@@ -69,5 +65,28 @@ public class Plane {
         this.range = range;
     }
 
+    public boolean isActual() {
+        return isActual;
+    }
 
+    public void setActual(boolean actual) {
+        isActual = actual;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Plane)) return false;
+        Plane plane = (Plane) o;
+        return getPlaneId() == plane.getPlaneId() &&
+                getCapacity() == plane.getCapacity() &&
+                getRange() == plane.getRange() &&
+                isActual() == plane.isActual() &&
+                getPlaneName().equals(plane.getPlaneName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getPlaneId(), getPlaneName(), getCapacity(), getRange(), isActual());
+    }
 }

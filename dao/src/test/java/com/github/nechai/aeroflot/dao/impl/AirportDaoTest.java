@@ -2,6 +2,7 @@ package com.github.nechai.aeroflot.dao.impl;
 
 import com.github.nechai.aeroflot.dao.HibernateUtil;
 import com.github.nechai.aeroflot.model.Airport;
+import com.github.nechai.aeroflot.model.Page;
 import org.junit.Before;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
@@ -30,7 +31,7 @@ class AirportDaoTest {
 
     @Test
     void getListAirport() {
-        List<Airport>  airportList=airportDao.getListAirport();
+        List<Airport>  airportList=airportDao.getListAirport(new Page(1));
     }
 
     @Test
@@ -52,6 +53,8 @@ class AirportDaoTest {
 
     @Test
     void getAirportById() {
-        assertEquals(testAirport,airportDao.getAirportById(testAirport.getId()));
+        assertEquals(testAirport,airportDao.getAirportById(
+                testAirport.getId()));
     }
+
 }

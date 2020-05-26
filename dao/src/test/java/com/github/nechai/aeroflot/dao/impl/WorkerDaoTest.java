@@ -5,6 +5,7 @@ import com.github.nechai.aeroflot.dao.converter.ProfessionConverter;
 import com.github.nechai.aeroflot.dao.entity.ProfessionEntity;
 import com.github.nechai.aeroflot.model.Airport;
 import com.github.nechai.aeroflot.model.Profession;
+import com.github.nechai.aeroflot.model.Role;
 import com.github.nechai.aeroflot.model.Worker;
 import org.hibernate.Session;
 import org.junit.jupiter.api.*;
@@ -58,5 +59,11 @@ class WorkerDaoTest {
     @Test
     void getWorkersByProfession() {
         workerDao.getWorkersByProfession(Profession.PILOT);
+    }
+
+
+    @Test
+    void getCountOfWorkers() {
+        assertNotNull( workerDao.getCountOfWorkers());
     }
 }

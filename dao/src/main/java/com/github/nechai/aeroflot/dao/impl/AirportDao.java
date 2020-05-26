@@ -4,10 +4,14 @@ import com.github.nechai.aeroflot.dao.IAirportDao;
 import com.github.nechai.aeroflot.dao.converter.AirportConverter;
 import com.github.nechai.aeroflot.dao.entity.AirportEntity;
 import com.github.nechai.aeroflot.model.Airport;
+import com.github.nechai.aeroflot.model.Page;
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
-import org.hibernate.query.Query;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,34 +56,56 @@ public class AirportDao implements IAirportDao {
     }
 
     @Override
-    public List<Airport> getListAirport() {
+    public List<Airport> getListAirport(Page page) {
         List <Airport> airports=new ArrayList<>();
         final Session session = HibernateUtil.getSession();
-        Query query = session.createQuery("from AirportEntity where actFl=:paramActFl");
-        query.setParameter("paramActFl", 1);
-        query.setTimeout(1000).setCacheable(true)
-    // добавлять в кэш, но не считывать из него
-                .setCacheMode(CacheMode.REFRESH)
-                .setHibernateFlushMode(FlushMode.COMMIT)
-    // сущности и коллекции помечаюся как только для чтения
-                .setReadOnly(true);
-        List <AirportEntity> airportEntityList=(List <AirportEntity>)query.list();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<AirportEntity> criteria = cb.createQuery(AirportEntity.class);
+        Root<AirportEntity> air=criteria.from(AirportEntity.class);
+        criteria.select(air).where(cb.equal(air.get("actFl"),1)).orderBy(cb.asc(air.get("name")));
+        TypedQuery<AirportEntity> typedQuery=session.createQuery(criteria);
+        typedQuery.setFirstResult(page.getFirst());
+        typedQuery.setMaxResults(page.getMax());
+        List<AirportEntity> airportEntityList=typedQuery.getResultList();
         for (AirportEntity a:airportEntityList) {
             airports.add(AirportConverter.fromEntity(a));
         }
         return airports;
     }
 
+    @Override
+    public List<Airport> getListAirport() {
+        List <Airport> airports=new ArrayList<>();
+        final Session session = HibernateUtil.getSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<AirportEntity> criteria = cb.createQuery(AirportEntity.class);
+        Root<AirportEntity> air=criteria.from(AirportEntity.class);
+        criteria.select(air).where(cb.equal(air.get("actFl"),1)).orderBy(cb.asc(air.get("name")));
+        List<AirportEntity> airportEntityList=session.createQuery(criteria).getResultList();
+        for (AirportEntity a:airportEntityList) {
+            airports.add(AirportConverter.fromEntity(a));
+        }
+        return airports;
+    }
+
+    @Override
+    public int getCountOfAirports() {
+        final Session session = HibernateUtil.getSession();
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<Long> criteria = cb.createQuery(Long.class);
+        criteria.select(cb.count(criteria.from(AirportEntity.class)));
+        long count = session.createQuery(criteria).getSingleResult();
+        return (int) count;
+    }
+
     public Airport getAirportById(int airportId) {
         final Session session = HibernateUtil.getSession();
-        Query query = session.createQuery("from AirportEntity where id=:paramId");
-        query.setParameter("paramId", airportId);
-        query.setTimeout(1000).setCacheable(true)
-                // добавлять в кэш, но не считывать из него
-                .setCacheMode(CacheMode.REFRESH)
-                .setHibernateFlushMode(FlushMode.COMMIT)
-                // сущности и коллекции помечаюся как только для чтения
-                .setReadOnly(true);
-        return AirportConverter.fromEntity((AirportEntity) query.uniqueResult());
+        CriteriaBuilder cb = session.getCriteriaBuilder();
+        CriteriaQuery<AirportEntity> criteria = cb.createQuery(AirportEntity.class);
+        Root<AirportEntity> air=criteria.from(AirportEntity.class);
+        criteria.select(air).where(cb.equal(air.get("id"),airportId));
+         AirportEntity a=session.createQuery(criteria).getSingleResult();
+        return AirportConverter.fromEntity(a);
+
     }
  }

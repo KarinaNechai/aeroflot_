@@ -1,15 +1,15 @@
 package com.github.nechai.aeroflot.model;
 
 public class User {
-        private int userId;
-        private String firstName;
-        private String lastName;
-        private String phone;
-        private String email;
-        private String login;
-        private String password;
-        private Role role;
-        private boolean isActual;
+    private int userId;
+    private String firstName;
+    private String lastName;
+    private String phone;
+    private String email;
+    private String login;
+    private String password;
+    private Role role;
+    private boolean isActual;
 
     public User(int userId, String firstName, String lastName, String phone, String email, String login, String password, Role role, boolean isActual) {
         this.userId = userId;
@@ -24,15 +24,15 @@ public class User {
     }
 
     public Role getRole() {
-            return role;
-        }
+        return role;
+    }
 
-        public boolean isActual() {
-            return isActual;
-        }
-        public User(){
+    public boolean isActual() {
+        return isActual;
+    }
 
-        }
+    public User() {
+    }
 
     public int getUserId() {
         return userId;
@@ -70,45 +70,45 @@ public class User {
         this.role = role;
     }
 
-    public User(String firstName, String lastName, String phone, String email, String login, String password, Role role)
-        {
-            this.firstName = firstName;
-            this.lastName = lastName;
-            this.phone = phone;
-            this.email = email;
-            this.login = login;
-            this.password = password;
-            this.role=role;
-         }
+    public User(String firstName, String lastName, String phone, String email, String login, String password, Role role) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.phone = phone;
+        this.email = email;
+        this.login = login;
+        this.password = password;
+        this.role = role;
+        this.isActual = true;
+    }
 
-        public String getLogin() {
+    public String getLogin() {
 
-            return login;
-        }
+        return login;
+    }
 
-        public String getPassword() {
-            return password;
-        }
+    public String getPassword() {
+        return password;
+    }
 
-        public String getFirstName() {
-            return firstName;
-        }
+    public String getFirstName() {
+        return firstName;
+    }
 
-        public String getLastName() {
-            return lastName;
-        }
+    public String getLastName() {
+        return lastName;
+    }
 
-        public String getPhone() {
-            return phone;
-        }
+    public String getPhone() {
+        return phone;
+    }
 
-        public String getEmail() {
-            return email;
-        }
+    public String getEmail() {
+        return email;
+    }
 
-        public void setActual(boolean actual) {
-            isActual = actual;
-        }
+    public void setActual(boolean actual) {
+        isActual = actual;
+    }
 
 
     @Override
@@ -116,11 +116,20 @@ public class User {
         if (this == o) return true;
         if (!(o instanceof User)) return false;
         User user = (User) o;
-        boolean a=isActual() == user.isActual() &&
+        boolean a1=isActual() == user.isActual();
+        boolean a2=this.getFirstName().equals(user.getFirstName());
+        boolean a3= this.getLastName().equals(user.getLastName());
+        boolean a4=this.getPhone().equals(user.getPhone());
+        boolean a5=this.getEmail().equals(user.getEmail());
+        boolean a6=this.getLogin().equals(user.getLogin());
+        boolean a7=this.getPassword().equals(user.getPassword());
+        boolean a8= this.getRole() == user.getRole();
+
+        boolean a = isActual() == user.isActual() &&
                 this.getFirstName().equals(user.getFirstName()) &&
                 this.getLastName().equals(user.getLastName()) &&
                 this.getPhone().equals(user.getPhone()) &&
-                this.getEmail().equals( user.getEmail()) &&
+                this.getEmail().equals(user.getEmail()) &&
                 this.getLogin().equals(user.getLogin()) &&
                 this.getPassword().equals(user.getPassword()) &&
                 this.getRole() == user.getRole();
@@ -129,22 +138,21 @@ public class User {
 
     @Override
     public int hashCode() {
-            int i=this.getFirstName().hashCode()+this.getLastName().hashCode()+this.getPhone().hashCode()+this.getEmail().hashCode()+this.getPassword().hashCode();
+        int i = this.getFirstName().hashCode() + this.getLastName().hashCode() + this.getPhone().hashCode() + this.getEmail().hashCode() + this.getPassword().hashCode();
         return i;
-                //Objects.hash(getFirstName(), getLastName(), getPhone(), getEmail(), getLogin(), getPassword(), getRole(), isActual());
     }
 
     @Override
-        public String toString() {
-            return "User{" +
-                    "firstName='" + firstName + '\'' +
-                    ", lastName='" + lastName + '\'' +
-                    ", phone='" + phone + '\'' +
-                    ", email='" + email + '\'' +
-                    ", login='" + login + '\'' +
-                    ", password='" + password + '\'' +
-                    ", role=" + role +
-                    ", isActual=" + isActual +
-                    '}';
-        }
+    public String toString() {
+        return "User{" +
+                "firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
+                ", login='" + login + '\'' +
+                ", password='" + password + '\'' +
+                ", role=" + role +
+                ", isActual=" + isActual +
+                '}';
     }
+}

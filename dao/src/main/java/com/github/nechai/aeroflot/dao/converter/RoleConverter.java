@@ -1,9 +1,7 @@
 package com.github.nechai.aeroflot.dao.converter;
 
 import com.github.nechai.aeroflot.dao.HibernateUtil;
-import com.github.nechai.aeroflot.dao.entity.ProfessionEntity;
 import com.github.nechai.aeroflot.dao.entity.RoleEntity;
-import com.github.nechai.aeroflot.model.Profession;
 import com.github.nechai.aeroflot.model.Role;
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
@@ -23,8 +21,9 @@ public class RoleConverter {
 
     public static void init() {
         final Session session = HibernateUtil.getSession();
-        Query query = session.createQuery("from RoleEntity where code=:paramCode");
-        query.setParameter("paramCode", Role.class.getName());
+        Query query = session.createQuery("from RoleEntity where code=:paramCode and actFl=:paramActFl");
+        query.setParameter("paramCode", Role.class.getSimpleName());
+        query.setParameter("paramActFl",1);
         query.setTimeout(1000).setCacheable(true)
                 // добавлять в кэш, но не считывать из него
                 .setCacheMode(CacheMode.REFRESH)
@@ -43,11 +42,13 @@ public class RoleConverter {
             return null;
         }
         final RoleEntity roleEntity = new RoleEntity();
-        roleEntity.setCode(Role.class.getName());
+        roleEntity.setCode(Role.class.getSimpleName());
         roleEntity.setValue(role.name());
-        if (mapRole.size() > 0) {
-            roleEntity.setId(mapRole.get(role));
+        if (mapRole.size() == 0) {
+           init();
         }
+        roleEntity.setId(mapRole.get(role));
+        roleEntity.setActFl(1);
         return roleEntity;
     }
 

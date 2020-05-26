@@ -1,15 +1,17 @@
 package com.github.nechai.aeroflot.service.impl;
+
 import com.github.nechai.aeroflot.dao.impl.AirportDao;
 import com.github.nechai.aeroflot.model.Airport;
+import com.github.nechai.aeroflot.model.Page;
 import com.github.nechai.aeroflot.service.IAirportService;
 
 import java.util.List;
 
 public class AirportService implements IAirportService {
-    AirportDao airportDao =AirportDao.getInstance();
+    AirportDao airportDao = AirportDao.getInstance();
     private static volatile IAirportService instance;
 
-    private AirportService(){
+    private AirportService() {
     }
 
     public static IAirportService getInstance() {
@@ -29,8 +31,7 @@ public class AirportService implements IAirportService {
     }
 
     @Override
-    public int updateAirport(Airport airport)
-    {
+    public int updateAirport(Airport airport) {
         return airportDao.save(airport);
     }
 
@@ -43,9 +44,20 @@ public class AirportService implements IAirportService {
     public int deleteAirport(int airportId) {
         return airportDao.delete(airportId);
     }
+
     @Override
     public Airport getAirportById(int airportId) {
         return airportDao.getAirportById(airportId);
+    }
+
+    @Override
+    public List<Airport> getListAirport(Page page) {
+        return airportDao.getListAirport(page);
+    }
+
+    @Override
+    public int getCountOfAirports() {
+        return airportDao.getCountOfAirports();
     }
 
     @Override

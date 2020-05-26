@@ -8,4 +8,5 @@ import javax.persistence.Table;
 @Entity
 @Table(name="classifier")
 public class ProfessionEntity extends SystemDictionary {
+
 }

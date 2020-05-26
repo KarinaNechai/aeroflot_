@@ -27,11 +27,11 @@
 }
 </style>
 <form action="${pageContext.request.contextPath}/navigation" method="post">
-					<ul id="navbarV">
-						<li><a href="<%=request.getContextPath()%>/flights">Flights</a></li>
-<!--						<li><a href="<%=request.getContextPath()%>/crew">Crew</a></li> -->
-						<li><a href="<%=request.getContextPath()%>/workers">Workers</a></li>
-						<li><a href="<%=request.getContextPath()%>/planes">Plane</a></li>				
-						<li><a href="<%=request.getContextPath()%>/airport">Airport</a></li>
-					</ul>
-</form>
+       					<ul id="navbarV">
+       						<li><a href="<%=request.getContextPath()%>/flights">Flights</a></li>
+       <!--						<li><a href="<%=request.getContextPath()%>/crew">Crew</a></li> -->
+       						<li><a href="<%=request.getContextPath()%>/workers">Workers</a></li>
+       						<li><a href="<%=request.getContextPath()%>/planes">Plane</a></li>
+       						<li><a href="<%=request.getContextPath()%>/airport">Airport</a></li>
+       					</ul>
+       </form>

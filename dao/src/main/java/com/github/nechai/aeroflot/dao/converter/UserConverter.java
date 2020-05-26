@@ -27,7 +27,7 @@ public class UserConverter {
         User user=new User();
         user.setUserId(userEntity.getId());
         user.setLastName(userEntity.getLastName());
-        user.setFirstName(userEntity.getLastName());
+        user.setFirstName(userEntity.getFirstName());
         user.setLogin(userEntity.getLogin());
         user.setPassword(userEntity.getPassword());
         user.setEmail(userEntity.getEmail());

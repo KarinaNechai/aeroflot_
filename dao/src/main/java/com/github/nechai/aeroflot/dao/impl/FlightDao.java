@@ -1,16 +1,17 @@
 package com.github.nechai.aeroflot.dao.impl;
 
 import com.github.nechai.aeroflot.dao.DataSource;
+import com.github.nechai.aeroflot.dao.HibernateUtil;
 import com.github.nechai.aeroflot.dao.IFlightDao;
+import com.github.nechai.aeroflot.dao.converter.FlightConverter;
+import com.github.nechai.aeroflot.dao.entity.FlightEntity;
 import com.github.nechai.aeroflot.model.Flight;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.text.SimpleDateFormat;
+import com.github.nechai.aeroflot.model.Page;
+import org.hibernate.CacheMode;
+import org.hibernate.FlushMode;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class FlightDao implements IFlightDao {
@@ -31,12 +32,10 @@ public class FlightDao implements IFlightDao {
         return localInstance;
     }
 
-
-    @Override
-    public boolean insert(int airportFrom, int airportTo, Date date) {
+  /*   public boolean insert(int airportFrom, int airportTo, LocalDateTime date) {
             String str= "INSERT INTO myapp.flight (airportfrom,airportto,flightdate) VALUES (?,?,?)";
         SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        String s=format.format(date);
+        String s=format(date);
         java.util.Date utilDate = date;
         java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
              try {
@@ -50,63 +49,87 @@ public class FlightDao implements IFlightDao {
                 throw new RuntimeException(e);
             }
 
+    }*/
+    @Override
+    public int save(Flight flight) {
+        FlightEntity flightEntity= FlightConverter.toEntity(flight);
+        final Session session = HibernateUtil.getSession();
+        session.beginTransaction();
+        session.saveOrUpdate(flightEntity);
+        session.getTransaction().commit();
+        return flightEntity.getId();
     }
 
     @Override
     public Flight getFlightById(int flightId) {
         Flight flight = null;
-        try {
-            String str="select t.* from myapp.flight t where t.flightid=?";
-            Connection connection = DataSource.getInstance().getConnection();
-            PreparedStatement ps = connection.prepareStatement(str);
-            ps.setInt(1, flightId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                flight = new Flight(
-                        flightId,
-                        rs.getInt("airportfrom"),
-                        rs.getInt("airportto"),
-                        rs.getInt("crewid"),
-                        rs.getInt("planeid"),
-                        rs.getInt("flightrange"),
-                        rs.getInt("amountpassengers"),
-                        rs.getDate("flightdate"),
-                        (rs.getInt("actfl") == 1)
-                );
-            }
-            }catch (SQLException e){
-            throw new RuntimeException(e);
-        }
-        return flight;
+        final Session session = HibernateUtil.getSession();
+        Query query = session.createQuery("from FlightEntity where id=:paramId");
+        query.setParameter("paramId", flightId);
+        query.setTimeout(1000).setCacheable(true)
+                // добавлять в кэш, но не считывать из него
+                .setCacheMode(CacheMode.REFRESH)
+                .setHibernateFlushMode(FlushMode.COMMIT)
+                // сущности и коллекции помечаюся как только для чтения
+                .setReadOnly(true);
+        return FlightConverter.fromEntity((FlightEntity) query.uniqueResult());
     }
+
     public List<Flight> getListFlight() {
         List <Flight> flights= new ArrayList<Flight>();
-        try {
-            Connection connection = DataSource.getInstance().getConnection();
-            PreparedStatement ps = connection.prepareStatement("select t.* from myapp.flight t  where t.actfl=?");
-            ps.setInt(1, 1);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Flight flight = new Flight(
-                        rs.getInt("flightid"),
-                        rs.getInt("airportfrom"),
-                        rs.getInt("airportto"),
-                        rs.getInt("crewid"),
-                        rs.getInt("planeid"),
-                        rs.getInt("flightrange"),
-                        rs.getInt("amountpassengers"),
-                        rs.getDate("flightdate"),
-                        rs.getInt("actfl") == 1);
-                        flights.add(flight);
-            }
-        }catch (SQLException e){
-            throw new RuntimeException(e);
+        final Session session = HibernateUtil.getSession();
+        Query query = session.createQuery("from FlightEntity where actFl=:paramActFl");
+        query.setParameter("paramActFl", 1);
+        query.setTimeout(1000).setCacheable(true)
+                // добавлять в кэш, но не считывать из него
+                .setCacheMode(CacheMode.REFRESH)
+                .setHibernateFlushMode(FlushMode.COMMIT)
+                // сущности и коллекции помечаюся как только для чтения
+                .setReadOnly(true);
+        List <FlightEntity> flightEntityList=(List <FlightEntity>)query.list();
+        for (FlightEntity f:flightEntityList) {
+            flights.add(FlightConverter.fromEntity(f));
+        }
+        return flights;
+    }
+    public List<Flight> getListFlight(Page page) {
+        List <Flight> flights= new ArrayList<Flight>();
+        final Session session = HibernateUtil.getSession();
+        Query query = session.createQuery("from FlightEntity where actFl=:paramActFl order by datetime asc ");
+        query.setParameter("paramActFl", 1);
+        query.setTimeout(1000).setCacheable(true)
+                // добавлять в кэш, но не считывать из него
+                .setCacheMode(CacheMode.REFRESH)
+                .setHibernateFlushMode(FlushMode.COMMIT)
+                // сущности и коллекции помечаюся как только для чтения
+                .setReadOnly(true);
+        query.setFirstResult(page.getFirst());
+        query.setMaxResults(page.getMax());
+        List <FlightEntity> flightEntityList=(List <FlightEntity>)query.list();
+        for (FlightEntity f:flightEntityList) {
+            flights.add(FlightConverter.fromEntity(f));
         }
         return flights;
     }
 
     @Override
-    public boolean delete(int flightId) {
-        return false;
+    public int delete(int flightId) {
+        Flight flight=getFlightById(flightId);
+        flight.setActual(false);
+        return save(flight);
+    }
+
+    public int getCountOfFlights() {
+        final Session session = HibernateUtil.getSession();
+        Query query = session.createQuery("select count(*) from FlightEntity where actFl=:paramActFl");
+        query.setParameter("paramActFl", 1);
+        query.setTimeout(1000).setCacheable(true)
+                // добавлять в кэш, но не считывать из него
+                .setCacheMode(CacheMode.REFRESH)
+                .setHibernateFlushMode(FlushMode.COMMIT).
+                // сущности и коллекции помечаюся как только для чтения
+                        setReadOnly(true);
+        long count=(Long) query.getSingleResult();
+        return (int) count;
     }
 }

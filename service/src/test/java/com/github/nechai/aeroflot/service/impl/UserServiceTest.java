@@ -48,8 +48,8 @@ public class UserServiceTest {
                 "TestUserPass",
                 Role.DISPATCHER
         );
-        Mockito.when(userDao.getUserBylogin("TestUserLogin")).thenReturn(user);
-        assertEquals(user,userService.getUser("TestUserLogin"));
+        Mockito.when(userDao.getUserById(1)).thenReturn(user);
+        assertEquals(user,userService.getUserById(1));
       }
 
     @Test

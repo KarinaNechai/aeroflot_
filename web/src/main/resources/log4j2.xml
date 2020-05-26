@@ -15,6 +15,18 @@
         </Console>
     </Appenders>
     <Loggers>
+        <Logger name=" org.hibernate.SQL" level="trace" additivity="false">
+            <appender-ref ref="fileLogger"/>
+            <appender-ref ref="console" />
+        </Logger>
+        <Logger name=" org.hibernate" level="debug" additivity="false">
+            <appender-ref ref="fileLogger" level="debug" />
+            <appender-ref ref="console" level="debug" />
+        </Logger>
+        <Logger name=" org.hibernate" level="debug" additivity="false">
+            <appender-ref ref="fileLogger" level="debug" />
+            <appender-ref ref="console" level="debug" />
+        </Logger>
         <Logger name="com.github.nechai" level="debug" additivity="true">
             <appender-ref ref="fileLogger" level="debug" />
         </Logger>

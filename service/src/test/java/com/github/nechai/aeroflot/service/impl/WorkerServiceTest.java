@@ -40,4 +40,19 @@ public class WorkerServiceTest {
         Mockito.when(workerDao.getWorkersOfSystem()).thenReturn(workerList);
         assertEquals( workerService.getWorkersOfSystem() , workerList);
     }
+
+    @Test
+    void getCountOfWorkers() {
+        Mockito.when(workerDao.getCountOfWorkers()).thenReturn(1);
+        assertEquals(1,workerService.getCountOfWorkers());
+    }
+
+
+    @Test
+    void addWorker() {
+        Worker w=new Worker("WorkerSurname", "WorkeFirstname",
+                "WorkerPatronomic2", Profession.RADIOMAN);
+        Mockito.when(workerDao.save( w)).thenReturn(1);
+        assertEquals(1,workerService.addWorker(w));
+    }
 }

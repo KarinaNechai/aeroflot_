@@ -1,6 +1,7 @@
 package com.github.nechai.aeroflot.service.impl;
 
 import com.github.nechai.aeroflot.dao.impl.PlaneDao;
+import com.github.nechai.aeroflot.model.Page;
 import com.github.nechai.aeroflot.model.Plane;
 import com.github.nechai.aeroflot.service.IPlaneService;
 
@@ -52,6 +53,16 @@ public class PlaneService implements IPlaneService {
     @Override
     public List<Plane> getListPlane() {
         return planeDao.getListPlane();
+    }
+
+    @Override
+    public List<Plane> getListPlane(Page page) {
+        return planeDao.getListPlane(page);
+    }
+
+    @Override
+    public int getCountOfPlanes() {
+        return planeDao.getCountOfPlanes();
     }
 }
 

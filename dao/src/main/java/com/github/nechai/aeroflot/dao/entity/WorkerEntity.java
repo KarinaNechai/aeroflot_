@@ -34,6 +34,7 @@ public class WorkerEntity {
     public void setWorkeFirstname(String workeFirstname) {
         this.workeFirstname = workeFirstname;
     }
+
     @Column(name = "workersurname")
     public String getWorkerSurname() {
         return workerSurname;
@@ -51,10 +52,9 @@ public class WorkerEntity {
     public void setWorkerPatronomic(String workerPatronomic) {
         this.workerPatronomic = workerPatronomic;
     }
-    @OneToOne (fetch=FetchType.EAGER,
-            cascade=CascadeType.ALL)
-    @JoinColumn (name= "workerprofession")
-  //  @Column(name = "workerprofession")
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "workerprofession")
     public ProfessionEntity getProfession() {
         return profession;
     }
@@ -62,6 +62,7 @@ public class WorkerEntity {
     public void setProfession(ProfessionEntity profession) {
         this.profession = profession;
     }
+
     @Column(name = "actfl")
     public int getActFl() {
         return actFl;

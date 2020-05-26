@@ -2,173 +2,13 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <html>
-	<head>
-    <meta charset="utf-8">
-    <title>Аэрофлот</title>
-    <style type="text/css">
-      #navbar ul{
-        display: none;
-        background-color: #f90;
-        position: absolute;
-        top: 100%;
-      }
-      #navbar li:hover ul { display: block; }
-      #navbar, #navbar ul{
-        margin: 0;
-        padding: 0;
-        list-style-type: none;
-      }
-      #navbar {
-        height: 30px;
-        background-color: #666;
-        padding-left: 25px;
-        min-width: 470px;
-      }
-      #navbar li {
-        float: left;
-        position: relative;
-        height: 100%;
-      }
-      #navbar li a {
-        display: block;
-        padding: 6px;
-        width: 100px;
-        color: #fff;
-        text-decoration: none;
-        text-align: center;
-      }
-	#navbarV ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    width: 25%;
-    background-color: #f1f1f1;
-    position: fixed;
-    height: 100%;
-    overflow: auto;
-}
-
-#navbarV li a {
-    display: block;
-    color: #000;
-    padding: 8px 16px;
-    text-decoration: none;
-}
-
-#navbarV li a.active {
-    background-color: #4CAF50;
-    color: white;
-}
-
-#navbarV li a:hover:not(.active) {
-    background-color: #555;
-    color: white;
-}
-	.footer {
- 	height: 40px;
-	background-color:#A3FFC2;
-	clear:both;
-	text-align:center;
-
-	.example_content {
-        min-height: calc(100vh - px);
- 	    width: 33.00%;
-		float: left;
-      }
-	.example_content2 {
-        min-height: calc(100vh - 40px);
- 	    width: 6733.00%;
-		float: right;
-      }
-}
- {box-sizing: border-box;}
- table {
-    border-collapse: collapse;
-    width: 100%;
-}
-
-th, td {
-    text-align: left;
-    padding: 8px;
-}
-
-tr:nth-child(even){background-color: #f2f2f2}
-
-th {
-    background-color: #4CAF50;
-    color: white;
-}
-/* Кнопка, используемая для открытия формы чата - закреплена в нижней части страницы */
-.open-button {
-  background-color: #555;
-  color: white;
-  padding: 16px 20px;
-  border: none;
-  cursor: pointer;
-  opacity: 0.8;
-  position: fixed;
-  bottom: 23px;
-  right: 28px;
-  width: 280px;
-}
-
-/* Всплывающий чат - скрыт по умолчанию */
-.airopor-popup {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  right: 15px;
-  border: 3px solid #f1f1f1;
-  z-index: 9;
-}
-
-/* Добавление стилей в контейнер формы */
-.form-container {
-  max-width: 300px;
-  padding: 10px;
-  background-color: white;
-}
-
-/* Полноразмерная текстовая область */
-.form-container input {
-  width: 100%;
-  padding: 15px;
-  margin: 5px 0 22px 0;
-  border: none;
-  background: #f1f1f1;
-  resize: none;
-  min-height: 100px;
-}
-
-/* Когда текстовая область получит фокус, сделайте что-нибудь */
-.form-container textarea:focus {
-  background-color: #ddd;
-  outline: none;
-}
-
-/* Установите стиль для кнопки отправить/кнопка */
- .form-container .btn {
-  background-color: #4CAF50;
-  color: white;
-  padding: 16px 20px;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-  margin-bottom:10px;
-  opacity: 0.8;
-}
-
-/* Добавьте красный цвет фона к кнопке отмена */
-.form-container .cancel {
-  background-color: red;
-}
-
-/* Добавьте некоторые эффекты наведения на кнопки */
-.form-container .btn:hover, .open-button:hover {
-  opacity: 1;
-}
-    </style>
-  </head>
+<head>
+        <meta charset="utf-8">
+        <title>Аэрофлот</title>
+        <style>
+            <%@include file='style.css' %>
+        </style>
+    </head>
 	<body>
 		<div id="container" style="width:100%">
 			<div id="header" style="background-color:#A3FFC2;">
@@ -184,16 +24,18 @@ th {
 						<table style="with: 50%" border = "1">
 							<tr>
 								<th>№</th>
+								<td>Date/Time </td>
 								<th>Airport from</th>
-								<th>Airport from</th>
+								<th>Airport To</th>
 								<th></th>
 								<th></th>
 							</tr>
 							<c:forEach items="${listFlight}" var="flight">
 								<tr>
 									<td>${flight.flightId}</td>
-									<td>${flight.airportFrom} </td>
-									<td>${flight.airportTo} </td>
+									<td>${flight. getDateTime()} </td>
+									<td>${flight.airportFrom.getName()} </td>
+									<td>${flight.airportTo.getName()} </td>
 									<td><button type="submit" name="Delete" value=${flight.flightId}>Delete</button></td>
 									<td><button type="submit" name="AddCrew" value=${flight.flightId}>AddCrew</button></td>
 								</tr>
@@ -201,6 +43,26 @@ th {
 							<tr>
 								<td><button type="submit" name="AddFlight">Add</button></td>
 							</tr>
+							<tr>
+                                <ul class="pagination">
+                                    <c:if test="${currentPage != 1}">
+                                        <li><a href="<%=request.getContextPath()%>//flights?page=${currentPage - 1}">Previous</a></li>
+                                    </c:if>
+                                    <c:forEach begin="1" end="${noOfPages}" var="i">
+                                        <c:choose>
+                                            <c:when test="${currentPage eq i}">
+                                                <li><a class="active" href="<%=request.getContextPath()%>//flights?page=${i}">${i}</a></li>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <li><a href="<%=request.getContextPath()%>//flights?page=${i}">${i}</a></li>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </c:forEach>
+                                    <c:if test="${currentPage lt noOfPages}">
+                                        <li><a href="<%=request.getContextPath()%>//flights?page=${currentPage +1}">Next</a></li>
+                                    </c:if>
+                                </u1>
+                            </tr>
 						</table>
 					</form>
 				</div>

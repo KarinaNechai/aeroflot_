@@ -3,6 +3,7 @@ package com.github.nechai.aeroflot.dao.converter;
 import com.github.nechai.aeroflot.dao.HibernateUtil;
 import com.github.nechai.aeroflot.dao.entity.ProfessionEntity;
 import com.github.nechai.aeroflot.model.Profession;
+import com.github.nechai.aeroflot.model.Role;
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
@@ -20,8 +21,11 @@ public class ProfessionConverter {
     public static void init()
     {
         final Session session = HibernateUtil.getSession();
-        Query query = session.createQuery("from ProfessionEntity where code=:paramId");
-        query.setParameter("paramId", "profession");
+        Query query = session.createQuery("from ProfessionEntity where code=:paramId and actFl=:paramActFl");
+        query.setParameter("paramId", Profession.class.getSimpleName());
+
+        String str=Profession.class.getSimpleName();
+        query.setParameter("paramActFl",1);
         query.setTimeout(1000).setCacheable(true)
                 // добавлять в кэш, но не считывать из него
                 .setCacheMode(CacheMode.REFRESH)
@@ -40,11 +44,13 @@ public class ProfessionConverter {
         return null;
         }
         final ProfessionEntity professionEntity=new  ProfessionEntity();
-        professionEntity.setCode("profession");
+        professionEntity.setCode(Profession.class.getSimpleName());
         professionEntity.setValue(profession.name());
-        if (mapPr.size()>0) {
-            professionEntity.setId(mapPr.get(profession));
+        if (mapPr.size()==0) {
+            init();
         }
+        professionEntity.setId(mapPr.get(profession));
+        professionEntity.setActFl(1);
         return  professionEntity;
     }
 
