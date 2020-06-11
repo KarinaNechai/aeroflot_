@@ -14,7 +14,7 @@ import static org.mockito.ArgumentMatchers.any;
 @ExtendWith(MockitoExtension.class)
 class PlaneServiceTest {
     @InjectMocks
-    PlaneService planeService= (PlaneService) PlaneService.getInstance();
+    PlaneService planeService;
     @Mock
     private PlaneDao planeDao;
 

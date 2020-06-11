@@ -1,16 +1,9 @@
 package com.github.nechai.aeroflot.dao.converter;
 
-import com.github.nechai.aeroflot.dao.HibernateUtil;
 import com.github.nechai.aeroflot.dao.entity.ProfessionEntity;
 import com.github.nechai.aeroflot.model.Profession;
-import com.github.nechai.aeroflot.model.Role;
-import org.hibernate.CacheMode;
-import org.hibernate.FlushMode;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ProfessionConverter {
@@ -20,7 +13,7 @@ public class ProfessionConverter {
     }
     public static void init()
     {
-        final Session session = HibernateUtil.getSession();
+ /*       final Session session = HibernateUtil.getSession();
         Query query = session.createQuery("from ProfessionEntity where code=:paramId and actFl=:paramActFl");
         query.setParameter("paramId", Profession.class.getSimpleName());
 
@@ -36,7 +29,7 @@ public class ProfessionConverter {
         for (ProfessionEntity pr:listProfessionEntity
         ) {
             mapPr.put(Profession.valueOf(pr.getvalue()),pr.getId());
-        }
+        }*/
     }
 
     public static ProfessionEntity toEntity(Profession profession){

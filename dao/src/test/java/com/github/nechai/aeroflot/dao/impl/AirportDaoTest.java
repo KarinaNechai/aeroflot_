@@ -1,24 +1,36 @@
 package com.github.nechai.aeroflot.dao.impl;
 
-import com.github.nechai.aeroflot.dao.HibernateUtil;
+import com.github.nechai.aeroflot.dao.config.DaoConfig;
 import com.github.nechai.aeroflot.model.Airport;
 import com.github.nechai.aeroflot.model.Page;
-import org.junit.Before;
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = DaoConfig.class)
+@Transactional
+//@ExtendWith(SpringExtension.class)
+//@ContextConfiguration(classes = {HibernateConfig.class, DaoConfig.class})
+//@Transactional
 class AirportDaoTest {
-    public static AirportDao  airportDao=AirportDao.getInstance();
+    @Autowired
+    public static AirportDao  airportDao;
+    @Autowired
+    public static SessionFactory sessionFactory;
     public static Airport testAirport=new Airport("Testb");
     @BeforeAll
     public static void init() {
-        EntityManager entityManager = HibernateUtil.getEntityManager("TEST-UNIT");
+        SessionFactory s=sessionFactory;
         int id=airportDao.save(testAirport);
         testAirport.setId(id);
 
@@ -31,6 +43,7 @@ class AirportDaoTest {
 
     @Test
     void getListAirport() {
+
         List<Airport>  airportList=airportDao.getListAirport(new Page(1));
     }
 

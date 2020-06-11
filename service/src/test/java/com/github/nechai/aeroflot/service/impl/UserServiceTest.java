@@ -16,15 +16,14 @@ import static org.mockito.ArgumentMatchers.any;
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
     @InjectMocks
-    UserService userService= (UserService) UserService.getInstance();
+    UserService userService;
     @Mock
     private UserDao userDao;
     @Test
     public void addUser() {
         Mockito.when(userDao.save(any())).thenReturn(1);
         Mockito.when(userDao.save(null)).thenReturn(-1);
-        UserService userService = (UserService) UserService.getInstance();
-        User user=new User(
+               User user=new User(
                 "TestUserName",
                 "TestUserFirstName",
                 "1111111111",

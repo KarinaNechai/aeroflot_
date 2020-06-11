@@ -1,6 +1,7 @@
 package com.github.nechai.aeroflot.dao.impl;
 
-import com.github.nechai.aeroflot.dao.HibernateUtil;
+import com.github.nechai.aeroflot.dao.config.DaoConfig;
+import com.github.nechai.aeroflot.dao.config.HibernateConfig;
 import com.github.nechai.aeroflot.model.Airport;
 import com.github.nechai.aeroflot.model.DateConverter;
 import com.github.nechai.aeroflot.model.Flight;
@@ -8,25 +9,29 @@ import com.github.nechai.aeroflot.model.Page;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.persistence.EntityManager;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {HibernateConfig.class, DaoConfig.class})
 class FlightDaoTest {
-    public static FlightDao flightDao = FlightDao.getInstance();
+    @Autowired
+    public static FlightDao flightDao;
+    @Autowired
+    public static AirportDao airportDao;
     public static Flight testFl;
-    public static AirportDao airportDao = AirportDao.getInstance();
     public static Airport testAirportFrom = new Airport("TestFrom");
     public static Airport testAirportTo = new Airport("TestTo");
 
     @BeforeAll
     public static void init() {
-        EntityManager entityManager = HibernateUtil.getEntityManager("TEST-UNIT");
+  //      EntityManager entityManager = HibernateUtil.getEntityManager("TEST-UNIT");
         int id = airportDao.save(testAirportFrom);
         testAirportFrom.setId(id);
         id = airportDao.save(testAirportTo);
@@ -38,7 +43,7 @@ class FlightDaoTest {
     @Test
     @Disabled
     void getFlightById() {
-        Flight flight=flightDao.getFlightById(testFl.getFlightId());
+        Flight flight = flightDao.getFlightById(testFl.getFlightId());
         assertEquals(testFl, flightDao.getFlightById(testFl.getFlightId()));
     }
 

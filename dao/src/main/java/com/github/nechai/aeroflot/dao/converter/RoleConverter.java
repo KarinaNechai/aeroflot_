@@ -1,15 +1,9 @@
 package com.github.nechai.aeroflot.dao.converter;
 
-import com.github.nechai.aeroflot.dao.HibernateUtil;
 import com.github.nechai.aeroflot.dao.entity.RoleEntity;
 import com.github.nechai.aeroflot.model.Role;
-import org.hibernate.CacheMode;
-import org.hibernate.FlushMode;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class RoleConverter {
@@ -20,7 +14,7 @@ public class RoleConverter {
     }
 
     public static void init() {
-        final Session session = HibernateUtil.getSession();
+ /*       final Session session = HibernateUtil.getSession();
         Query query = session.createQuery("from RoleEntity where code=:paramCode and actFl=:paramActFl");
         query.setParameter("paramCode", Role.class.getSimpleName());
         query.setParameter("paramActFl",1);
@@ -34,7 +28,7 @@ public class RoleConverter {
         for (RoleEntity pr : listRoleEntity
         ) {
             mapRole.put(Role.valueOf(pr.getvalue()), pr.getId());
-        }
+        }*/
     }
 
     public static RoleEntity toEntity(Role role) {

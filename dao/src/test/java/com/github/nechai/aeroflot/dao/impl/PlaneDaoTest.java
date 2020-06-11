@@ -1,24 +1,29 @@
 package com.github.nechai.aeroflot.dao.impl;
 
-import com.github.nechai.aeroflot.dao.HibernateUtil;
+import com.github.nechai.aeroflot.dao.config.DaoConfig;
+import com.github.nechai.aeroflot.dao.config.HibernateConfig;
 import com.github.nechai.aeroflot.model.Page;
 import com.github.nechai.aeroflot.model.Plane;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {HibernateConfig.class, DaoConfig.class})
 class PlaneDaoTest {
-    public static PlaneDao planeDao = PlaneDao.getInstance();
+    @Autowired
+    public static PlaneDao planeDao;
     public static Plane testPlane = new Plane("TestPlane");
 
     @BeforeAll
     public static void init() {
-        EntityManager entityManager = HibernateUtil.getEntityManager("TEST-UNIT");
+   //     EntityManager entityManager = HibernateUtil.getEntityManager("TEST-UNIT");
         int id = planeDao.save(testPlane);
         testPlane.setPlaneId(id);
     }

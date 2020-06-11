@@ -1,90 +1,30 @@
 package com.github.nechai.aeroflot.dao.impl;
 
-import com.github.nechai.aeroflot.dao.DataSource;
-import com.github.nechai.aeroflot.dao.HibernateUtil;
 import com.github.nechai.aeroflot.dao.IWorkerDao;
-import com.github.nechai.aeroflot.dao.converter.AirportConverter;
 import com.github.nechai.aeroflot.dao.converter.ProfessionConverter;
 import com.github.nechai.aeroflot.dao.converter.WorkerConverter;
-import com.github.nechai.aeroflot.dao.entity.AirportEntity;
 import com.github.nechai.aeroflot.dao.entity.ProfessionEntity;
 import com.github.nechai.aeroflot.dao.entity.WorkerEntity;
 import com.github.nechai.aeroflot.model.*;
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import javax.persistence.EntityManagerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
 public class WorkerDao implements IWorkerDao {
-    private static volatile WorkerDao instance;
+    private final SessionFactory factory;
 
-    private WorkerDao() {
+    public WorkerDao(SessionFactory factory) {
+        this.factory = factory;
     }
 
-    public static WorkerDao getInstance() {
-        WorkerDao localInstance = instance;
-        if (localInstance == null) {
-            synchronized (WorkerDao.class) {
-                localInstance = instance;
-                if (localInstance == null) {
-                    instance = localInstance = new WorkerDao();
-                }
-            }
-        }
-        return localInstance;
-    }
-
- /*   public boolean deleteFromBaseForTests(Worker worker) {
-        boolean result;
-        int workerId = getId(worker);
-        String str = "delete from myapp.worker where workerid=?";
-        try {
-            Connection connection = DataSource.getInstance().getConnection();
-            PreparedStatement rs = connection.prepareStatement(str);
-            rs.setInt(1, workerId);
-            result = (rs.executeUpdate() == 1);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return result;
-    }*/
-
- /*   private boolean isExist (Worker worker){
-        try {
-            String str="select * from myapp.worker t where t.workerid=?";
-            Connection connection = DataSource.getInstance().getConnection();
-            PreparedStatement ps = connection.prepareStatement(str);
-            ps.setInt(1, worker.getWorkerid());
-            ResultSet rs = ps.executeQuery();
-            return (rs.next()) ;
-        }catch (SQLException e){
-            throw new RuntimeException(e);
-        }
-    }*/
-
-  /* public int getId (Worker worker){
-        try {
-            String str="select t.workerid from myapp.worker t where t.workersurname=?";
-            Connection connection = DataSource.getInstance().getConnection();
-            PreparedStatement ps = connection.prepareStatement(str);
-            ps.setString(1, worker.getWorkerSurname() != null ? worker.getWorkerSurname() : "");
-            ResultSet rs = ps.executeQuery();
-            return (rs.next()?rs.getInt("workerid"):-1) ;
-        }catch (SQLException e){
-            throw new RuntimeException(e);
-        }
-    }*/
-
-    public Worker getWorkerById(int workerId) {
-
-        final Session session = HibernateUtil.getSession();
+     public Worker getWorkerById(int workerId) {
+        final Session session = factory.getCurrentSession();
         Query query = session.createQuery("from WorkerEntity where id=:paramId");
         query.setParameter("paramId", workerId);
         query.setTimeout(1000).setCacheable(true)
@@ -99,7 +39,7 @@ public class WorkerDao implements IWorkerDao {
     @Override
     public int save(Worker worker) {
         WorkerEntity workerEntity = WorkerConverter.toEntity(worker);
-        final Session session = HibernateUtil.getSession();
+        final Session session = factory.getCurrentSession();
         session.beginTransaction();
         session.saveOrUpdate(workerEntity);
         session.getTransaction().commit();
@@ -122,7 +62,7 @@ public class WorkerDao implements IWorkerDao {
     @Override
     public List<Worker> getWorkersOfSystem() {
         List<Worker> workers = new ArrayList<>();
-        final Session session = HibernateUtil.getSession();
+        final Session session = factory.getCurrentSession();
         Query query = session.createQuery("from WorkerEntity where actFl=:paramActFl order by workerSurname asc");
         query.setParameter("paramActFl", 1);
         query.setTimeout(1000).setCacheable(true)
@@ -140,7 +80,7 @@ public class WorkerDao implements IWorkerDao {
 
     public List<Worker> getWorkersOfSystem(Page page) {
         List<Worker> workers = new ArrayList<>();
-        final Session session = HibernateUtil.getSession();
+        final Session session = factory.getCurrentSession();
         Query query = session.createQuery("from WorkerEntity where actFl=:paramActFl order by workerSurname asc");
         query.setParameter("paramActFl", 1);
         query.setFirstResult(page.getFirst());
@@ -163,7 +103,7 @@ public class WorkerDao implements IWorkerDao {
     public List<Worker> getWorkersByProfession(Profession profession) {
         ProfessionEntity professionEntity = ProfessionConverter.toEntity(profession);
         List<Worker> workers = new ArrayList<>();
-        final Session session = HibernateUtil.getSession();
+        final Session session = factory.getCurrentSession();
         Query query = session.createQuery("from WorkerEntity where actFl=:paramActFl and profession=:paramPr order by workerSurname asc");
         query.setParameter("paramActFl", 1);
         query.setParameter("paramPr", professionEntity);
@@ -181,7 +121,7 @@ public class WorkerDao implements IWorkerDao {
     }
 
     public int getCountOfWorkers() {
-        final Session session = HibernateUtil.getSession();
+        final Session session = factory.getCurrentSession();
         Query query = session.createQuery("select count(*) from WorkerEntity where actFl=:paramActFl");
         query.setParameter("paramActFl", 1);
         query.setTimeout(1000).setCacheable(true)

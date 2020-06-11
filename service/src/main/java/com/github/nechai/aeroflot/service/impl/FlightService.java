@@ -1,55 +1,46 @@
 package com.github.nechai.aeroflot.service.impl;
 
-import com.github.nechai.aeroflot.dao.impl.FlightDao;
+import com.github.nechai.aeroflot.dao.IFlightDao;
 import com.github.nechai.aeroflot.model.Flight;
 import com.github.nechai.aeroflot.model.Page;
 import com.github.nechai.aeroflot.service.IFlightService;
-
-import java.time.LocalDateTime;
-import java.util.Date;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 
 public class FlightService implements IFlightService {
-    FlightDao flightDao = FlightDao.getInstance().getInstance();
-    private static volatile IFlightService instance;
-    private void PlaneService(){
-    }
+    IFlightDao flightDao;
 
-    public static IFlightService getInstance() {
-        IFlightService localInstance = instance;
-        if (localInstance == null) {
-            synchronized (IFlightService.class) {
-                localInstance = instance;
-                if (localInstance == null) {
-                    instance = localInstance = (IFlightService) new FlightService();
-                }
-            }
-        }
-        return localInstance;
+    public FlightService(IFlightDao flightDao) {
+        this.flightDao = flightDao;
     }
 
     @Override
+    @Transactional
     public Flight getFlightById(int flightId) {
         return flightDao.getFlightById(flightId);
     }
 
     @Override
+    @Transactional
     public List<Flight> getListFlight() {
         return flightDao.getListFlight();
     }
 
     @Override
+    @Transactional
     public int save(Flight flight) {
         return flightDao.save(flight);
     }
 
     @Override
+    @Transactional
     public List<Flight> getListFlight(Page page) {
         return flightDao.getListFlight(page);
     }
 
     @Override
+    @Transactional
     public int getCountOfFlights() {
         return flightDao.getCountOfFlights();
     }

@@ -1,22 +1,24 @@
 package com.github.nechai.aeroflot.dao.impl;
 
-import com.github.nechai.aeroflot.dao.HibernateUtil;
-import com.github.nechai.aeroflot.dao.converter.ProfessionConverter;
-import com.github.nechai.aeroflot.dao.converter.RoleConverter;
-import com.github.nechai.aeroflot.model.Profession;
+import com.github.nechai.aeroflot.dao.config.DaoConfig;
+import com.github.nechai.aeroflot.dao.config.HibernateConfig;
 import com.github.nechai.aeroflot.model.Role;
 import com.github.nechai.aeroflot.model.User;
-import org.hibernate.Session;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import javax.persistence.EntityManager;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {HibernateConfig.class, DaoConfig.class})
 public class UserDaoTest {
-    public static UserDao  userDao=UserDao.getInstance();
+    @Autowired
+    public static UserDao  userDao;
 
     public static User testUser=new User(
             "TestUserName",
@@ -38,9 +40,9 @@ public class UserDaoTest {
     );
     @BeforeAll
     public static void init() {
-        EntityManager entityManager = HibernateUtil.getEntityManager("TEST-UNIT");
-        final Session session = HibernateUtil.getSession();
-        session.beginTransaction();
+/*        EntityManager entityManager = HibernateUtil.getEntityManager("TEST-UNIT");
+//        final Session session = HibernateUtil.getSession();
+   //     session.beginTransaction();
         for (Role p:Role.values() ) {
             session.saveOrUpdate(RoleConverter.toEntity(p));
         }
@@ -49,7 +51,7 @@ public class UserDaoTest {
         int id=userDao.save(testUser);
         testUser.setUserId(id);
         id=userDao.save(testUser2);
-        testUser2.setUserId(id);
+        testUser2.setUserId(id);*/
 
 
     }

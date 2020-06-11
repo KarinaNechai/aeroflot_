@@ -20,7 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 @ExtendWith(MockitoExtension.class)
 public class WorkerServiceTest {
     @InjectMocks
-    WorkerService workerService= (WorkerService) WorkerService.getInstance();
+    WorkerService workerService;
     @Mock
     private WorkerDao workerDao;
     @Test

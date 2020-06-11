@@ -13,5 +13,5 @@ public interface IAirportDao {
     List<Airport> getListAirport(Page page);
     List<Airport> getListAirport();
     int getCountOfAirports();
-
+    Airport getAirportById(int airportId);
 }

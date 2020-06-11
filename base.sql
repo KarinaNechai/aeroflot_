@@ -105,3 +105,4 @@ INSERT INTO `myapp`.`classifier` (`clasid`, `clascode`, `clasval`, `actfl`, `cla
 INSERT INTO `myapp`.`classifier` (`clasid`, `clascode`, `clasval`, `actfl`, `clasdesc`) VALUES ('9', 'Role', 'USER', '1', 'Пассажир');
 INSERT INTO `myapp`.`classifier` (`clasid`, `clascode`, `clasval`, `actfl`, `clasdesc`) VALUES ('10', 'reason', 'technicalfailure', '1', 'Техническая неисправность');
 INSERT INTO `myapp`.`classifier` (`clasid`, `clascode`, `clasval`, `actfl`, `clasdesc`) VALUES ('11', 'reason', 'weither', '1', 'Погода');
+INSERT INTO `myapp`.`USER` (`userid`, `userlogin`, `email`, `userpassword`, `usersurname`, `userfirstname`, `userphone`, `actfl`, `userpatronomic`, `userrole`) VALUES ('13', 'admin', 'test@test.by', 'admin', 'Глушков', 'Иван', '+375297075019', '1', 'Иванович', '1');

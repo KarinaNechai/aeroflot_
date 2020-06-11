@@ -20,7 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 @ExtendWith(MockitoExtension.class)
 public class AirportServiceTest {
     @InjectMocks
-    AirportService airportService= (AirportService)AirportService.getInstance();
+    AirportService airportService;
     @Mock
     private AirportDao airportDao;
     @Test

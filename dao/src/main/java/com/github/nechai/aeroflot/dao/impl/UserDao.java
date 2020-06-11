@@ -1,6 +1,5 @@
 package com.github.nechai.aeroflot.dao.impl;
 
-import com.github.nechai.aeroflot.dao.HibernateUtil;
 import com.github.nechai.aeroflot.dao.IUserDao;
 import com.github.nechai.aeroflot.dao.converter.RoleConverter;
 import com.github.nechai.aeroflot.dao.converter.UserConverter;
@@ -12,34 +11,24 @@ import com.github.nechai.aeroflot.model.User;
 import org.hibernate.CacheMode;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
+
+import javax.persistence.EntityManagerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserDao implements IUserDao {
+    private final SessionFactory factory;
 
-    private static volatile UserDao instance;
-
-    private UserDao() {
+    public UserDao(SessionFactory factory) {
+        this.factory = factory;
     }
 
-    public static UserDao getInstance() {
-        UserDao localInstance = instance;
-        if (localInstance == null) {
-            synchronized (UserDao.class) {
-                localInstance = instance;
-                if (localInstance == null) {
-                    instance = localInstance = new UserDao();
-                }
-            }
-        }
-        return localInstance;
-    }
-
-    @Override
+     @Override
     public int save(User user) {
         UserEntity userEntity = UserConverter.toEntity(user);
-        final Session session = HibernateUtil.getSession();
+        final Session session =factory.getCurrentSession();
         session.beginTransaction();
         session.saveOrUpdate(userEntity);
         session.getTransaction().commit();
@@ -62,7 +51,7 @@ public class UserDao implements IUserDao {
 
     @Override
     public User getUserByLogin(String login) {
-        final Session session = HibernateUtil.getSession();
+        final Session session = factory.getCurrentSession();
         Query query = session.createQuery("from UserEntity where login=:paramLogin");
         query.setParameter("paramLogin", login);
         query.setTimeout(1000).setCacheable(true)
@@ -73,8 +62,9 @@ public class UserDao implements IUserDao {
                 .setReadOnly(true);
         return UserConverter.fromEntity((UserEntity) query.uniqueResult());
     }
+
     public User getUserById(int userId) {
-        final Session session = HibernateUtil.getSession();
+        final Session session = factory.getCurrentSession();
         Query query = session.createQuery("from UserEntity where id=:paramId");
         query.setParameter("paramId", userId);
         return UserConverter.fromEntity((UserEntity) query.uniqueResult());
@@ -84,7 +74,7 @@ public class UserDao implements IUserDao {
     public List<User> getUsersByRole(Role role) {
         RoleEntity roleEntity = RoleConverter.toEntity(role);
         List<User> users = new ArrayList<>();
-        final Session session = HibernateUtil.getSession();
+        final Session session = factory.getCurrentSession();
         Query query = session.createQuery("from UserEntity where role=:paramRole and actFl=:paramActFl order by lastName asc");
         query.setParameter("paramRole", roleEntity);
         query.setParameter("paramActFl", 1);
@@ -104,7 +94,7 @@ public class UserDao implements IUserDao {
     public List<User> getUsersByRole(Role role, Page page) {
         RoleEntity roleEntity = RoleConverter.toEntity(role);
         List<User> users = new ArrayList<>();
-        final Session session = HibernateUtil.getSession();
+        final Session session = factory.getCurrentSession();
         Query query = session.createQuery("from UserEntity where role=:paramRole and actFl=:paramActFl order by lastName asc");
         query.setParameter("paramRole", roleEntity);
         query.setParameter("paramActFl", 1);
@@ -132,7 +122,7 @@ public class UserDao implements IUserDao {
 
     public int getCountOfUsers(Role role) {
         RoleEntity roleEntity = RoleConverter.toEntity(role);
-        final Session session = HibernateUtil.getSession();
+        final Session session = factory.getCurrentSession();
         Query query = session.createQuery("select count(*) from UserEntity where actFl=:paramActFl and role=:paramRole");
         query.setParameter("paramActFl", 1);
         query.setParameter("paramRole", roleEntity);
